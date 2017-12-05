@@ -1,13 +1,45 @@
 organization := "com.github.biopet"
 name := "sbt-biopet"
 
+sbtPlugin := true
+
 scalaVersion := "2.10.6"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 useGpg := true
 
-sbtPlugin := true
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
+
+import ReleaseTransformations._
+releaseProcess := Seq[ReleaseStep](
+  releaseStepCommand("git fetch"),
+  releaseStepCommand("git checkout master"),
+  releaseStepCommand("git pull"),
+  releaseStepCommand("git merge origin/develop"),
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  //releaseStepCommand("ghpagesPushSite"),
+  releaseStepCommand("publishSigned"),
+  releaseStepCommand("sonatypeReleaseAll"),
+  pushChanges,
+  releaseStepCommand("git checkout develop"),
+  releaseStepCommand("git merge master"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
+)
 
 libraryDependencies ++= Seq(
   Defaults.sbtPluginExtra(
