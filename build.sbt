@@ -25,6 +25,25 @@ libraryDependencies ++= Seq(
     "com.eed3si9n" % "sbt-assembly" % "0.14.5",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.jsuereth" % "sbt-pgp" % "1.0.0",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "org.xerial.sbt" % "sbt-sonatype" % "1.1",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.eed3si9n" % "sbt-assembly" % "0.14.5",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.typesafe.sbt" % "sbt-site" % "1.3.1",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
   )
-
 )
