@@ -74,8 +74,8 @@ object BiopetPlugin extends AutoPlugin {
 
   def BiopetProjectSettings: Seq[Setting[_]] = Seq(
     mainClass in assembly := {
-      if (biopetIsTool.value) Some(
-      s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
+      if (biopetIsTool.value)
+        Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
       else None
     },
     git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git"
@@ -125,22 +125,24 @@ object BiopetPlugin extends AutoPlugin {
     }
   }
   private def biopetGenerateDocsFunction(): Unit = {
-    if (biopetIsTool.value) {import Attributed.data
-    val r = (runner in Runtime).value
-    val args = Seq("--generateDocs",
-                    s"outputDir=${biopetDocsDir.value.toString}," +
-                      s"version=${version.value}," +
-                      s"release=${!isSnapshot.value}",
-                    version.value)
-    val classPath = (fullClasspath in Runtime).value
-    r.run(
-        s"${(mainClass in assembly).value.get}",
-        data(classPath),
-        args,
-        streams.value.log
-      )
-      .foreach(sys.error)
-  }}
+    if (biopetIsTool.value) {
+      import Attributed.data
+      val r = (runner in Runtime).value
+      val args = Seq("--generateDocs",
+                     s"outputDir=${biopetDocsDir.value.toString}," +
+                       s"version=${version.value}," +
+                       s"release=${!isSnapshot.value}",
+                     version.value)
+      val classPath = (fullClasspath in Runtime).value
+      r.run(
+          s"${(mainClass in assembly).value.get}",
+          data(classPath),
+          args,
+          streams.value.log
+        )
+        .foreach(sys.error)
+    }
+  }
   private def biopetGenerateReadmeFunction(): Unit = {
     if (biopetIsTool.value) {
       import sbt.Attributed.data
@@ -148,11 +150,11 @@ object BiopetPlugin extends AutoPlugin {
       val args = Seq("--generateReadme", biopetReadmePath.value.toString)
       val classPath = (fullClasspath in Runtime).value
       r.run(
-        s"${(mainClass in assembly).value.get}",
-        data(classPath),
-        args,
-        streams.value.log
-      )
+          s"${(mainClass in assembly).value.get}",
+          data(classPath),
+          args,
+          streams.value.log
+        )
         .foreach(sys.error)
     }
   }
