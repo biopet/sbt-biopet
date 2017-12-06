@@ -98,9 +98,9 @@ object BiopetPlugin extends AutoPlugin {
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
-      releaseStepCommand("ghpagesPushSite"),
       releaseStepCommand("publishSigned"),
       releaseStepCommand("sonatypeReleaseAll"),
+      releaseStepCommand("ghpagesPushSite"),
       pushChanges,
       releaseStepCommand("git checkout develop"),
       releaseStepCommand("git merge master"),
@@ -124,7 +124,7 @@ object BiopetPlugin extends AutoPlugin {
   private def biopetGenerateDocsFunction(): Unit = {
     import Attributed.data
     val r = (runner in Runtime).value
-    val input = Seq("--generateDocs",
+    val args = Seq("--generateDocs",
                     s"outputDir=${biopetDocsDir.value.toString}," +
                       s"version=${version.value}," +
                       s"release=${!isSnapshot.value}",
@@ -133,7 +133,7 @@ object BiopetPlugin extends AutoPlugin {
     r.run(
         s"${(mainClass in assembly).value.get}",
         data(classPath),
-        input,
+        args,
         streams.value.log
       )
       .foreach(sys.error)
@@ -141,12 +141,12 @@ object BiopetPlugin extends AutoPlugin {
   private def biopetGenerateReadmeFunction(): Unit = {
     import sbt.Attributed.data
     val r: ScalaRun = (runner in Runtime).value
-    val input = Seq("--generateReadme", biopetReadmePath.value.toString)
+    val args = Seq("--generateReadme", biopetReadmePath.value.toString)
     val classPath = (fullClasspath in Runtime).value
     r.run(
         s"${(mainClass in assembly).value.get}",
         data(classPath),
-        input,
+        args,
         streams.value.log
       )
       .foreach(sys.error)
