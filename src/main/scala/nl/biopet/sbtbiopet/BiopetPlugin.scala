@@ -23,6 +23,7 @@ import sbtassembly.AssemblyPlugin
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp
+import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import sbtrelease.ReleasePlugin
 import ReleasePlugin.autoImport.ReleaseTransformations._
 import ReleasePlugin.autoImport.{
@@ -46,102 +47,108 @@ object BiopetPlugin extends AutoPlugin {
   object autoImport extends BiopetKeys
   import autoImport._
 
-  def BiopetGlobalSettings: Seq[Setting[_]] = {
+  def BiopetGlobalSettings: Seq[Setting[_]] = Seq(
+    // Publication to nexus repository
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    publishTo := biopetPublishTo,
+    useGpg := true,
+    // Jar assembly
+    releaseProcess := biopetReleaseProcess,
+    // Documentation variables
+    biopetDocsDir := file("%s/markdown".format(target.value.toString)),
+    sourceDirectory in LaikaSite := biopetDocsDir.value,
+    sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
+    siteDirectory in Laika := file(target.value.toString + "/site"),
+    ghpagesRepository := file(target.value.toString + "/gh"),
+    siteSubdirName in SiteScaladoc := {
+      if (isSnapshot.value) { "develop/api" } else s"${version.value}/api"
+    },
+    rawContent := true, //Laika use raw HTML content in markdown.
+    includeFilter in ghpagesCleanSite := biopetCleanSiteFilter,
+    biopetGenerateDocs := biopetGenerateDocsFunction,
+    biopetGenerateReadme := biopetGenerateReadmeFunction,
+    makeSite := (makeSite triggeredBy biopetGenerateDocs).value,
+    makeSite := (makeSite dependsOn biopetGenerateDocs).value,
+    ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
+  )
 
-    Seq(
-      // Publication to nexus repository
-      resolvers += Resolver.sonatypeRepo("snapshots"),
-      publishTo := {
-        val nexus = "https://oss.sonatype.org/"
-        if (isSnapshot.value)
-          Some("snapshots" at nexus + "content/repositories/snapshots")
-        else
-          Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
-      SbtPgp.autoImport.useGpg := true,
-      // Jar assembly
-      mainClass in assembly := Some(
-        s"nl.biopet.${name.value.toLowerCase()}.${name.value}"),
-      releaseProcess := Seq[ReleaseStep](
-        releaseStepCommand("git fetch"),
-        releaseStepCommand("git checkout master"),
-        releaseStepCommand("git pull"),
-        releaseStepCommand("git merge origin/develop"),
-        checkSnapshotDependencies,
-        inquireVersions,
-        runClean,
-        runTest,
-        setReleaseVersion,
-        commitReleaseVersion,
-        tagRelease,
-        releaseStepCommand("ghpagesPushSite"),
-        releaseStepCommand("publishSigned"),
-        releaseStepCommand("sonatypeReleaseAll"),
-        pushChanges,
-        releaseStepCommand("git checkout develop"),
-        releaseStepCommand("git merge master"),
-        setNextVersion,
-        commitNextVersion,
-        pushChanges
-      ),
-      // Documentation variables
-      biopetUrlToolName := name.value.toLowerCase(),
-      biopetDocsDir := file(target.value.toString + "/markdown"),
-      sourceDirectory in LaikaSite := biopetDocsDir.value,
-      sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
-      siteDirectory in Laika := file(target.value.toString() + "/site"),
-      git.remoteRepo := s"git@github.com:biopet/${biopetUrlToolName.value}.git",
-      ghpagesRepository := file(target.value.toString + "/gh"),
-      siteSubdirName in SiteScaladoc := {
-        if (isSnapshot.value) { "develop/api" } else s"${version.value}/api"
-      },
-      rawContent := true, //Laika use raw HTML content in markdown.
-      includeFilter in ghpagesCleanSite := new FileFilter {
-        def accept(f: File) = {
-          if (isSnapshot.value) {
-            f.getPath.contains("develop")
-          } else {
-            f.getPath.contains(s"${version.value}") ||
-            f.getPath == new java.io.File(ghpagesRepository.value,
-                                          "index.html").getPath
-          }
-        }
-      }
+  def BiopetProjectSettings: Seq[Setting[_]] = Seq(
+    mainClass in assembly := Some(
+      s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}"),
+    git.remoteRepo := s"git@github.com:biopet/${biopetUrlToolName.value}.git"
+  )
+  private def biopetPublishTo: Option[Resolver] = {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some(Opts.resolver.sonatypeSnapshots)
+    else
+      Some(Opts.resolver.sonatypeStaging)
+  }
+
+  private def biopetReleaseProcess: Seq[ReleaseStep] = {
+    Seq[ReleaseStep](
+      releaseStepCommand("git fetch"),
+      releaseStepCommand("git checkout master"),
+      releaseStepCommand("git pull"),
+      releaseStepCommand("git merge origin/develop"),
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      releaseStepCommand("ghpagesPushSite"),
+      releaseStepCommand("publishSigned"),
+      releaseStepCommand("sonatypeReleaseAll"),
+      pushChanges,
+      releaseStepCommand("git checkout develop"),
+      releaseStepCommand("git merge master"),
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
     )
   }
-  def BiopetProjectSettings: Seq[Setting[_]] = Seq(
-    biopetGenerateDocs := {
-      import Attributed.data
-      val r = (runner in Runtime).value
-      val input = Seq("--generateDocs",
-                      s"outputDir=${biopetDocsDir.value.toString}," +
-                        s"version=${version.value}," +
-                        s"release=${!isSnapshot.value}",
-                      version.value)
-      val classPath = (fullClasspath in Runtime).value
-      r.run(
-          s"${(mainClass in assembly).value.get}",
-          data(classPath),
-          input,
-          streams.value.log
-        )
-        .foreach(sys.error)
-    },
-    biopetGenerateReadme := {
-      import sbt.Attributed.data
-      val r: ScalaRun = (runner in Runtime).value
-      val input = Seq("--generateReadme", biopetReadmePath.value.toString)
-      val classPath = (fullClasspath in Runtime).value
-      r.run(
-          s"${(mainClass in assembly).value.get}",
-          data(classPath),
-          input,
-          streams.value.log
-        )
-        .foreach(sys.error)
-    },
-    makeSite := (makeSite triggeredBy (biopetGenerateDocs)).value,
-    makeSite := (makeSite dependsOn (biopetGenerateDocs)).value,
-    ghpagesPushSite := (ghpagesPushSite dependsOn (makeSite)).value
-  )
+  private def biopetCleanSiteFilter: FileFilter = {
+    new FileFilter {
+      def accept(f: File) = {
+        if (isSnapshot.value) {
+          f.getPath.contains("develop")
+        } else {
+          f.getPath.contains(s"${version.value}") ||
+          f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
+        }
+      }
+    }
+  }
+  private def biopetGenerateDocsFunction(): Unit = {
+    import Attributed.data
+    val r = (runner in Runtime).value
+    val input = Seq("--generateDocs",
+                    s"outputDir=${biopetDocsDir.value.toString}," +
+                      s"version=${version.value}," +
+                      s"release=${!isSnapshot.value}",
+                    version.value)
+    val classPath = (fullClasspath in Runtime).value
+    r.run(
+        s"${(mainClass in assembly).value.get}",
+        data(classPath),
+        input,
+        streams.value.log
+      )
+      .foreach(sys.error)
+  }
+  private def biopetGenerateReadmeFunction(): Unit = {
+    import sbt.Attributed.data
+    val r: ScalaRun = (runner in Runtime).value
+    val input = Seq("--generateReadme", biopetReadmePath.value.toString)
+    val classPath = (fullClasspath in Runtime).value
+    r.run(
+        s"${(mainClass in assembly).value.get}",
+        data(classPath),
+        input,
+        streams.value.log
+      )
+      .foreach(sys.error)
+  }
 }
