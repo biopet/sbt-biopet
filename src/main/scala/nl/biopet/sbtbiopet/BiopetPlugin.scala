@@ -73,9 +73,12 @@ object BiopetPlugin extends AutoPlugin {
   )
 
   def BiopetProjectSettings: Seq[Setting[_]] = Seq(
-    mainClass in assembly := Some(
-      s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}"),
-    git.remoteRepo := s"git@github.com:biopet/${biopetUrlToolName.value}.git"
+    mainClass in assembly := {
+      if (biopetIsTool.value) Some(
+      s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
+      else None
+    },
+    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git"
   )
   private def biopetPublishTo: Option[Resolver] = {
     val nexus = "https://oss.sonatype.org/"
@@ -122,7 +125,7 @@ object BiopetPlugin extends AutoPlugin {
     }
   }
   private def biopetGenerateDocsFunction(): Unit = {
-    import Attributed.data
+    if (biopetIsTool.value) {import Attributed.data
     val r = (runner in Runtime).value
     val args = Seq("--generateDocs",
                     s"outputDir=${biopetDocsDir.value.toString}," +
@@ -137,18 +140,20 @@ object BiopetPlugin extends AutoPlugin {
         streams.value.log
       )
       .foreach(sys.error)
-  }
+  }}
   private def biopetGenerateReadmeFunction(): Unit = {
-    import sbt.Attributed.data
-    val r: ScalaRun = (runner in Runtime).value
-    val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-    val classPath = (fullClasspath in Runtime).value
-    r.run(
+    if (biopetIsTool.value) {
+      import sbt.Attributed.data
+      val r: ScalaRun = (runner in Runtime).value
+      val args = Seq("--generateReadme", biopetReadmePath.value.toString)
+      val classPath = (fullClasspath in Runtime).value
+      r.run(
         s"${(mainClass in assembly).value.get}",
         data(classPath),
         args,
         streams.value.log
       )
-      .foreach(sys.error)
+        .foreach(sys.error)
+    }
   }
 }
