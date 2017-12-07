@@ -1,5 +1,7 @@
 package nl.biopet.sbtbiopet
 
+import scoverage.ScoverageSbtPlugin
+import org.scoverage.coveralls.CoverallsPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
@@ -47,9 +49,15 @@ object BiopetPlugin extends AutoPlugin {
   object autoImport extends BiopetKeys
 
   import autoImport._
-  def biopetGlobalSettings: Seq[Setting[_]] = Nil
+  def biopetGlobalSettings: Seq[Setting[_]] = {
+    super.globalSettings ++
+      ScoverageSbtPlugin.globalSettings // Having seen the source I dare not put this in project settings
+  }
 
-  def biopetBuildSettings: Seq[Setting[_]] = Nil
+  def biopetBuildSettings: Seq[Setting[_]] = {
+    super.buildSettings ++
+      ScoverageSbtPlugin.buildSettings
+  }
 
   def biopetProjectSettings: Seq[Setting[_]] = {
     GhpagesPlugin.projectSettings ++
@@ -61,6 +69,8 @@ object BiopetPlugin extends AutoPlugin {
       SiteScaladocPlugin.projectSettings ++
       LaikaSitePlugin.projectSettings ++
       ScalafmtSbtPlugin.projectSettings ++
+      CoverallsPlugin.projectSettings ++
+      ScoverageSbtPlugin.projectSettings ++
       biopetDocumentationSettings ++
       biopetReleaseSettings ++
       biopetAssemblySettings ++
