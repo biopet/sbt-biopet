@@ -4,14 +4,21 @@ import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
   ghpagesCleanSite,
+  ghpagesPushSite,
   ghpagesRepository
+}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.{
+  ghpagesGlobalSettings,
+  ghpagesProjectSettings
 }
 import com.typesafe.sbt.site.SitePlugin.autoImport.{
   makeSite,
   siteDirectory,
   siteSubdirName
 }
+import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
+import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
 import sbt.Keys._
@@ -36,13 +43,16 @@ object BiopetPlugin extends AutoPlugin {
   object autoImport extends BiopetKeys
 
   import autoImport._
-
   def biopetGlobalSettings: Seq[Setting[_]] = Nil
 
   def biopetBuildSettings: Seq[Setting[_]] = Nil
 
   def biopetProjectSettings: Seq[Setting[_]] = {
-    biopetDocumentationSettings ++
+    ghpagesProjectSettings ++ ghpagesGlobalSettings ++
+      SitePlugin.projectSettings ++
+      SiteScaladocPlugin.projectSettings ++
+      LaikaSitePlugin.projectSettings ++
+      biopetDocumentationSettings ++
       biopetReleaseSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
@@ -87,8 +97,8 @@ object BiopetPlugin extends AutoPlugin {
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
     biopetGenerateReadme := biopetGenerateReadmeFunction().value,
     makeSite := (makeSite triggeredBy biopetGenerateDocs).value,
-    makeSite := (makeSite dependsOn biopetGenerateDocs).value
-    //ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
+    makeSite := (makeSite dependsOn biopetGenerateDocs).value,
+    ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
 
   private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
