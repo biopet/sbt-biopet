@@ -36,11 +36,20 @@ object BiopetPlugin extends AutoPlugin {
   import autoImport._
 
   def BiopetGlobalSettings: Seq[Setting[_]] = Seq(
+  )
+
+  def BiopetProjectSettings: Seq[Setting[_]] = Seq(
     // Publication to nexus repository
     resolvers += Resolver.sonatypeRepo("snapshots"),
     publishTo := biopetPublishTo.value,
     useGpg := true,
     // Jar assembly
+    mainClass in assembly := {
+      if (biopetIsTool.value)
+        Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
+      else None
+    },
+    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git",
     releaseProcess := biopetReleaseProcess,
     // Documentation variables
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
@@ -58,15 +67,6 @@ object BiopetPlugin extends AutoPlugin {
     makeSite := (makeSite triggeredBy biopetGenerateDocs).value,
     makeSite := (makeSite dependsOn biopetGenerateDocs).value,
     ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
-  )
-
-  def BiopetProjectSettings: Seq[Setting[_]] = Seq(
-    mainClass in assembly := {
-      if (biopetIsTool.value)
-        Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
-      else None
-    },
-    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git"
   )
   private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
   Def.setting {
