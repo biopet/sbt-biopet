@@ -46,7 +46,11 @@ object BiopetPlugin extends AutoPlugin {
   def biopetBuildSettings: Seq[Setting[_]] = Nil
 
   def biopetProjectSettings: Seq[Setting[_]] = {
-    GhpagesPlugin.projectSettings ++ GhpagesPlugin.globalSettings ++
+    GhpagesPlugin.projectSettings ++
+      // Importing globalSettings into projectSettings,
+      // it does not change functionality, and removes those nasty
+      // global variables.
+      GhpagesPlugin.globalSettings ++
       SitePlugin.projectSettings ++
       SiteScaladocPlugin.projectSettings ++
       LaikaSitePlugin.projectSettings ++
@@ -71,7 +75,8 @@ object BiopetPlugin extends AutoPlugin {
         url(s"https://github.com/biopet/${biopetUrlName.value}"),
         s"scm:git@github.com:biopet/${biopetUrlName.value}.git"
       )),
-    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git"
+    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git",
+    biopetIsTool := false // This should not have to be defined for utils.
   )
 
   private def biopetReleaseSettings: Seq[Setting[_]] = Seq(
