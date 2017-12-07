@@ -21,17 +21,10 @@ import ReleasePlugin.autoImport.ReleaseTransformations._
 import ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
 
 object BiopetPlugin extends AutoPlugin {
-  override val requires: Plugins = {
-    SitePlugin &&
-    GhpagesPlugin &&
-    AssemblyPlugin &&
-    SbtPgp &&
-    ReleasePlugin &&
-    LaikaSitePlugin &&
-    SiteScaladocPlugin
-  }
+  override val requires: Plugins = empty
   override lazy val globalSettings: Seq[Setting[_]] = BiopetGlobalSettings
   override lazy val projectSettings: Seq[Setting[_]] = BiopetProjectSettings
+
   object autoImport extends BiopetKeys
   import autoImport._
 
