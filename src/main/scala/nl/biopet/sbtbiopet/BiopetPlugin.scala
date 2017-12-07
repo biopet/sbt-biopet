@@ -2,17 +2,27 @@ package nl.biopet.sbtbiopet
 
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesRepository}
-import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
+  ghpagesCleanSite,
+  ghpagesRepository
+}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{
+  makeSite,
+  siteDirectory,
+  siteSubdirName
+}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport.assembly
-import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
+import sbtrelease.ReleasePlugin.autoImport.{
+  ReleaseStep,
+  releaseProcess,
+  releaseStepCommand
+}
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -37,14 +47,14 @@ object BiopetPlugin extends AutoPlugin {
       biopetAssemblySettings ++
       biopetReleaseSettings ++
       biopetProjectInformationSettings
-}
-  private def biopetAssemblySettings: Seq[Setting[_]] = Seq(
-mainClass in assembly := {
-  if (biopetIsTool.value)
-  Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
-  else None
-  )})
-  private def biopetProjectInformationSettings: Seq[Setting[_]]= Seq(
+  }
+  private def biopetAssemblySettings: Seq[Setting[_]] =
+    Seq(mainClass in assembly := {
+      if (biopetIsTool.value)
+        Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
+      else None
+    })
+  private def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
     homepage := Some(url(s"https://github.com/biopet/${biopetUrlName.value}")),
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     scmInfo := Some(
@@ -82,12 +92,12 @@ mainClass in assembly := {
   )
 
   private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
-  Def.setting {
-    if (isSnapshot.value)
-      Some(Opts.resolver.sonatypeSnapshots)
-    else
-      Some(Opts.resolver.sonatypeStaging)
-  }
+    Def.setting {
+      if (isSnapshot.value)
+        Some(Opts.resolver.sonatypeSnapshots)
+      else
+        Some(Opts.resolver.sonatypeStaging)
+    }
 
   private def biopetReleaseProcess: Seq[ReleaseStep] = {
     Seq[ReleaseStep](
@@ -114,52 +124,53 @@ mainClass in assembly := {
     )
   }
   private def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
-  Def.setting {
-    new FileFilter {
-      def accept(f: File) = {
-        if (isSnapshot.value) {
-          f.getPath.contains("develop")
-        } else {
-          f.getPath.contains(s"${version.value}") ||
-          f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
+    Def.setting {
+      new FileFilter {
+        def accept(f: File) = {
+          if (isSnapshot.value) {
+            f.getPath.contains("develop")
+          } else {
+            f.getPath.contains(s"${version.value}") ||
+            f.getPath == new java.io.File(ghpagesRepository.value,
+                                          "index.html").getPath
+          }
         }
       }
     }
-  }
   private def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
-    if (biopetIsTool.value) {
-      import Attributed.data
-      val r = (runner in Runtime).value
-      val args = Seq("--generateDocs",
-                     s"outputDir=${biopetDocsDir.value.toString}," +
-                       s"version=${version.value}," +
-                       s"release=${!isSnapshot.value}",
-                     version.value)
-      val classPath = (fullClasspath in Runtime).value
-      r.run(
-          s"${(mainClass in assembly).value.get}",
-          data(classPath),
-          args,
-          streams.value.log
-        )
-        .foreach(sys.error)
+      if (biopetIsTool.value) {
+        import Attributed.data
+        val r = (runner in Runtime).value
+        val args = Seq("--generateDocs",
+                       s"outputDir=${biopetDocsDir.value.toString}," +
+                         s"version=${version.value}," +
+                         s"release=${!isSnapshot.value}",
+                       version.value)
+        val classPath = (fullClasspath in Runtime).value
+        r.run(
+            s"${(mainClass in assembly).value.get}",
+            data(classPath),
+            args,
+            streams.value.log
+          )
+          .foreach(sys.error)
+      }
     }
-  }
   private def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
-    if (biopetIsTool.value) {
-      import sbt.Attributed.data
-      val r: ScalaRun = (runner in Runtime).value
-      val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-      val classPath = (fullClasspath in Runtime).value
-      r.run(
-          s"${(mainClass in assembly).value.get}",
-          data(classPath),
-          args,
-          streams.value.log
-        )
-        .foreach(sys.error)
+      if (biopetIsTool.value) {
+        import sbt.Attributed.data
+        val r: ScalaRun = (runner in Runtime).value
+        val args = Seq("--generateReadme", biopetReadmePath.value.toString)
+        val classPath = (fullClasspath in Runtime).value
+        r.run(
+            s"${(mainClass in assembly).value.get}",
+            data(classPath),
+            args,
+            streams.value.log
+          )
+          .foreach(sys.error)
+      }
     }
-  }
 }
