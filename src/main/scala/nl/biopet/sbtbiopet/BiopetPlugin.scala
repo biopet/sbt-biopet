@@ -1,51 +1,68 @@
 package nl.biopet.sbtbiopet
 
-import sbt.{Def, _}
-import Keys._
-import com.typesafe.sbt.site.SitePlugin
-import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
-import com.typesafe.sbt.site.laika.LaikaSitePlugin
-import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
-import com.typesafe.sbt.site.SiteScaladocPlugin
-import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesPushSite, ghpagesRepository}
-import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
-import sbtassembly.AssemblyPlugin
-import sbtassembly.AssemblyPlugin.autoImport.assembly
 import com.typesafe.sbt.SbtGit.git
-import com.typesafe.sbt.SbtPgp
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesRepository}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
+import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
+import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
+import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
+import sbt.Keys._
+import sbt.{Def, _}
+import sbtassembly.AssemblyPlugin.autoImport.assembly
 import sbtrelease.ReleasePlugin
-import ReleasePlugin.autoImport.ReleaseTransformations._
-import ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
+import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
+import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
+
   override def requires: Plugins = empty
-  override lazy val globalSettings: Seq[Setting[_]] = BiopetGlobalSettings
-  override lazy val projectSettings: Seq[Setting[_]] = BiopetProjectSettings
+
+  override lazy val globalSettings: Seq[Setting[_]] = biopetGlobalSettings
+  override lazy val projectSettings: Seq[Setting[_]] = biopetProjectSettings
+  override lazy val buildSettings: Seq[Setting[_]] = biopetBuildSettings
 
   object autoImport extends BiopetKeys
+
   import autoImport._
 
-  def BiopetGlobalSettings: Seq[Setting[_]] = Seq(
+  def biopetGlobalSettings: Seq[Setting[_]] = Nil
+
+  def biopetBuildSettings: Seq[Setting[_]] = Nil
+
+  def biopetProjectSettings: Seq[Setting[_]] = {
+    biopetDocumentationSettings ++
+      biopetReleaseSettings ++
+      biopetAssemblySettings ++
+      biopetReleaseSettings ++
+      biopetProjectInformationSettings
+}
+  private def biopetAssemblySettings: Seq[Setting[_]] = Seq(
+mainClass in assembly := {
+  if (biopetIsTool.value)
+  Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
+  else None
+  )})
+  private def biopetProjectInformationSettings: Seq[Setting[_]]= Seq(
+    homepage := Some(url(s"https://github.com/biopet/${biopetUrlName.value}")),
+    licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
+    scmInfo := Some(
+      ScmInfo(
+        url(s"https://github.com/biopet/${biopetUrlName.value}"),
+        s"scm:git@github.com:biopet/${biopetUrlName.value}.git"
+      )),
+    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git"
   )
 
-  def BiopetProjectSettings: Seq[Setting[_]] = Seq(
-    // Publication to nexus repository
+  private def biopetReleaseSettings: Seq[Setting[_]] = Seq(
     resolvers += Resolver.sonatypeRepo("snapshots"),
     publishTo := biopetPublishTo.value,
+    publishMavenStyle := true,
     useGpg := true,
-    // Jar assembly
-    mainClass in assembly := {
-      if (biopetIsTool.value)
-        Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
-      else None
-    },
-    git.remoteRepo := s"git@github.com:biopet/${biopetUrlName.value}.git",
-    releaseProcess := biopetReleaseProcess,
-    // Documentation variables
+    releaseProcess := biopetReleaseProcess
+  )
+  private def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
     sourceDirectory in LaikaSite := biopetDocsDir.value,
@@ -63,6 +80,7 @@ object BiopetPlugin extends AutoPlugin {
     makeSite := (makeSite dependsOn biopetGenerateDocs).value
     //ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
+
   private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
   Def.setting {
     if (isSnapshot.value)
