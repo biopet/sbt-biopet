@@ -3,17 +3,9 @@ package nl.biopet.sbtbiopet
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
-  ghpagesCleanSite,
-  ghpagesPushSite,
-  ghpagesRepository
-}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesPushSite, ghpagesRepository}
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.site.SitePlugin.autoImport.{
-  makeSite,
-  siteDirectory,
-  siteSubdirName
-}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
@@ -21,13 +13,11 @@ import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
 import sbt.Keys._
 import sbt.{Def, _}
-import sbtassembly.AssemblyPlugin.autoImport.assembly
+import sbtassembly.AssemblyPlugin.autoImport
+import sbtassembly.AssemblyPlugin.autoImport.{Assembly, assembly, assemblyMergeStrategy,PathList}
+import sbtassembly.MergeStrategy
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{
-  ReleaseStep,
-  releaseProcess,
-  releaseStepCommand
-}
+import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -66,7 +56,8 @@ object BiopetPlugin extends AutoPlugin {
       if (biopetIsTool.value)
         Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
       else None
-    })
+    },
+      assemblyMergeStrategy in assembly := biopetMergeStrategy)
   private def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
     homepage := Some(url(s"https://github.com/biopet/${biopetUrlName.value}")),
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
@@ -104,7 +95,31 @@ object BiopetPlugin extends AutoPlugin {
     makeSite := (makeSite dependsOn biopetGenerateDocs).value,
     ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
-
+  private def biopetMergeStrategy: String => MergeStrategy = {
+    case PathList(ps @ _*) if ps.last endsWith "pom.properties" =>
+      MergeStrategy.first
+    case PathList(ps @ _*) if ps.last endsWith "pom.xml" =>
+      MergeStrategy.first
+    case x if Assembly.isConfigFile(x) =>
+      MergeStrategy.concat
+    case PathList(ps @ _*) if Assembly.isReadme(ps.last) || Assembly.isLicenseFile(ps.last) =>
+      MergeStrategy.rename
+    case PathList("META-INF", xs @ _*) =>
+      (xs map {_.toLowerCase}) match {
+        case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) =>
+          MergeStrategy.discard
+        case ps @ (x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
+          MergeStrategy.discard
+        case "plexus" :: xs =>
+          MergeStrategy.discard
+        case "services" :: xs =>
+          MergeStrategy.filterDistinctLines
+        case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
+          MergeStrategy.filterDistinctLines
+        case _ => MergeStrategy.deduplicate
+      }
+    case _ => MergeStrategy.first
+  }
   private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
     Def.setting {
       if (isSnapshot.value)
