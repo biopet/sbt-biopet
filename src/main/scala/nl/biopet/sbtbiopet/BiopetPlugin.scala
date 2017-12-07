@@ -1,5 +1,6 @@
 package nl.biopet.sbtbiopet
 
+import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
@@ -7,10 +8,7 @@ import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
   ghpagesPushSite,
   ghpagesRepository
 }
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.{
-  ghpagesGlobalSettings,
-  ghpagesProjectSettings
-}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin
 import com.typesafe.sbt.site.SitePlugin.autoImport.{
   makeSite,
   siteDirectory,
@@ -48,10 +46,11 @@ object BiopetPlugin extends AutoPlugin {
   def biopetBuildSettings: Seq[Setting[_]] = Nil
 
   def biopetProjectSettings: Seq[Setting[_]] = {
-    ghpagesProjectSettings ++ ghpagesGlobalSettings ++
+    GhpagesPlugin.projectSettings ++ GhpagesPlugin.globalSettings ++
       SitePlugin.projectSettings ++
       SiteScaladocPlugin.projectSettings ++
       LaikaSitePlugin.projectSettings ++
+      ScalafmtSbtPlugin.projectSettings ++
       biopetDocumentationSettings ++
       biopetReleaseSettings ++
       biopetAssemblySettings ++

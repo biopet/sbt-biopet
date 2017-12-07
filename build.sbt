@@ -76,6 +76,11 @@ libraryDependencies ++= Seq(
     "com.github.gseitz" % "sbt-release" % "1.0.6",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.lucidchart" % "sbt-scalafmt" % "1.10",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
   )
 )
 
