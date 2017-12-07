@@ -21,7 +21,7 @@ import ReleasePlugin.autoImport.ReleaseTransformations._
 import ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
 
 object BiopetPlugin extends AutoPlugin {
-  override def trigger: PluginTrigger = noTrigger
+  override def trigger: PluginTrigger = AllRequirements
   override def requires: Plugins = empty
   override lazy val globalSettings: Seq[Setting[_]] = BiopetGlobalSettings
   override lazy val projectSettings: Seq[Setting[_]] = BiopetProjectSettings
@@ -47,6 +47,7 @@ object BiopetPlugin extends AutoPlugin {
     releaseProcess := biopetReleaseProcess,
     // Documentation variables
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
+    biopetReadmePath := file("README.md").getAbsoluteFile,
     sourceDirectory in LaikaSite := biopetDocsDir.value,
     sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
     siteDirectory in Laika := file(target.value.toString + "/site"),
@@ -59,8 +60,8 @@ object BiopetPlugin extends AutoPlugin {
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
     biopetGenerateReadme := biopetGenerateReadmeFunction().value,
     makeSite := (makeSite triggeredBy biopetGenerateDocs).value,
-    makeSite := (makeSite dependsOn biopetGenerateDocs).value,
-    ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
+    makeSite := (makeSite dependsOn biopetGenerateDocs).value
+    //ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
   private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
   Def.setting {
