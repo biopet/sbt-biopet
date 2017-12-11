@@ -4,8 +4,7 @@ scala:
   - 2.11.11
 
 script:
-  - sbt clean coverage scripted coverageReport &&
-    sbt coverageAggregate
+  - sbt clean scripted
 #after_success:
 #  - sbt coveralls
 #  - bash <(curl -s https://codecov.io/bash)
