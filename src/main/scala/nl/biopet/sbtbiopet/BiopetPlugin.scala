@@ -92,11 +92,6 @@ object BiopetPlugin extends AutoPlugin {
    */
   protected def biopetAssemblySettings: Seq[Setting[_]] =
     Seq(
-      mainClass in assembly := {
-        if (biopetIsTool.value)
-          Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
-        else None
-      },
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
 
