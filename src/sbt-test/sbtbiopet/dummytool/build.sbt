@@ -6,7 +6,7 @@ biopetIsTool := true
 
 target := file("target")
 
-mainClass in assembly := Some(s"nl.biopet.tools.${name.value.toLowerCase()}.${name.value}")
+mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool")
 
 scalaVersion := "2.11.11"
 
