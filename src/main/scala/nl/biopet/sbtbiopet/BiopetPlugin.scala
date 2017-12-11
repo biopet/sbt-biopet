@@ -81,11 +81,10 @@ object BiopetPlugin extends AutoPlugin {
       ScalafmtSbtPlugin.projectSettings ++
       CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
-      biopetDocumentationSettings ++
-      biopetReleaseSettings ++
+      biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
-      biopetProjectInformationSettings
+      biopetDocumentationSettings
   }
 
   /*
