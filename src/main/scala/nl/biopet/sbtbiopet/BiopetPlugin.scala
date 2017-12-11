@@ -77,7 +77,7 @@ object BiopetPlugin extends AutoPlugin {
       biopetReleaseSettings ++
       biopetProjectInformationSettings
   }
-  private def biopetAssemblySettings: Seq[Setting[_]] =
+  protected def biopetAssemblySettings: Seq[Setting[_]] =
     Seq(
       mainClass in assembly := {
         if (biopetIsTool.value)
@@ -86,7 +86,7 @@ object BiopetPlugin extends AutoPlugin {
       },
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
-  private def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
+  protected def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
     homepage := Some(url(s"https://github.com/biopet/${biopetUrlName.value}")),
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     scmInfo := Some(
@@ -98,7 +98,7 @@ object BiopetPlugin extends AutoPlugin {
     biopetIsTool := false // This should not have to be defined for utils.
   )
 
-  private def biopetReleaseSettings: Seq[Setting[_]] = Seq(
+  protected def biopetReleaseSettings: Seq[Setting[_]] = Seq(
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
     publishTo := biopetPublishTo.value,
@@ -106,7 +106,7 @@ object BiopetPlugin extends AutoPlugin {
     useGpg := true,
     releaseProcess := biopetReleaseProcess
   )
-  private def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
+  protected def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
     sourceDirectory in LaikaSite := biopetDocsDir.value,
@@ -124,7 +124,7 @@ object BiopetPlugin extends AutoPlugin {
     makeSite := (makeSite dependsOn biopetGenerateDocs).value,
     ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
-  private def biopetMergeStrategy: String => MergeStrategy = {
+  protected def biopetMergeStrategy: String => MergeStrategy = {
     case PathList(ps @ _ *) if ps.last endsWith "pom.properties" =>
       MergeStrategy.first
     case PathList(ps @ _ *) if ps.last endsWith "pom.xml" =>
@@ -154,7 +154,7 @@ object BiopetPlugin extends AutoPlugin {
       }
     case _ => MergeStrategy.first
   }
-  private def biopetPublishTo: Def.Initialize[Option[Resolver]] =
+  protected def biopetPublishTo: Def.Initialize[Option[Resolver]] =
     Def.setting {
       if (isSnapshot.value)
         Some(Opts.resolver.sonatypeSnapshots)
@@ -162,7 +162,7 @@ object BiopetPlugin extends AutoPlugin {
         Some(Opts.resolver.sonatypeStaging)
     }
 
-  private def biopetReleaseProcess: Seq[ReleaseStep] = {
+  protected def biopetReleaseProcess: Seq[ReleaseStep] = {
     Seq[ReleaseStep](
       releaseStepCommand("git fetch"),
       releaseStepCommand("git checkout master"),
@@ -186,7 +186,7 @@ object BiopetPlugin extends AutoPlugin {
       pushChanges
     )
   }
-  private def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
+  protected def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
     Def.setting {
       new FileFilter {
         def accept(f: File) = {
@@ -200,7 +200,7 @@ object BiopetPlugin extends AutoPlugin {
         }
       }
     }
-  private def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
+  protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
       if (biopetIsTool.value) {
         import Attributed.data
@@ -220,7 +220,7 @@ object BiopetPlugin extends AutoPlugin {
           .foreach(sys.error)
       }
     }
-  private def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
+  protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
       if (biopetIsTool.value) {
         import sbt.Attributed.data
