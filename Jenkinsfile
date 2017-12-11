@@ -11,7 +11,7 @@ node('local') {
         }
 
         stage('Build & Test') {
-            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean compile scripted"
+            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean scripted"
         }
 
         stage('Results') {
