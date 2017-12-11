@@ -3,7 +3,7 @@
 $ exists target/scala-2.11/DummyTool-assembly-0.1.jar
 
 # Test generation of documentation
-> makeSite
-$ exists target/markdown/index.md
-$ exists target/laikaSite/index.html
-$ exists target/site/0.1/api/index.html
+#> makeSite
+#$ exists target/markdown/index.md
+#$ exists target/laikaSite/index.html
+#$ exists target/site/0.1/api/index.html
