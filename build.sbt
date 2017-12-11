@@ -16,6 +16,12 @@ publishTo := {
     Some(Opts.resolver.sonatypeStaging)
 }
 
+ScriptedPlugin.scriptedSettings
+scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+  Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
+}
+scriptedBufferLog := false
+
 import ReleaseTransformations._
 releaseProcess := Seq[ReleaseStep](
   releaseStepCommand("git fetch"),
