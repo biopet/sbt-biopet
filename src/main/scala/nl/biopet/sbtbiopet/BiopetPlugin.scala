@@ -49,16 +49,26 @@ object BiopetPlugin extends AutoPlugin {
   object autoImport extends BiopetKeys
 
   import autoImport._
+
+  /*
+   * Settings to be inherited globally across all projects
+   */
   def biopetGlobalSettings: Seq[Setting[_]] = {
     super.globalSettings ++
       ScoverageSbtPlugin.globalSettings // Having seen the source I dare not put this in project settings
   }
 
+  /*
+   * Settings to be added to the build scope. Settings here are applied only once.
+   */
   def biopetBuildSettings: Seq[Setting[_]] = {
     super.buildSettings ++
       ScoverageSbtPlugin.buildSettings
   }
 
+  /*
+   * Settings that are project specific
+   */
   def biopetProjectSettings: Seq[Setting[_]] = {
     GhpagesPlugin.projectSettings ++
       // Importing globalSettings into projectSettings,
@@ -77,6 +87,10 @@ object BiopetPlugin extends AutoPlugin {
       biopetReleaseSettings ++
       biopetProjectInformationSettings
   }
+
+  /*
+   * All assembly specific settings
+   */
   protected def biopetAssemblySettings: Seq[Setting[_]] =
     Seq(
       mainClass in assembly := {
@@ -86,6 +100,10 @@ object BiopetPlugin extends AutoPlugin {
       },
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
+
+  /*
+   * A sequence of settings containing information such as homepage, licences and git related information.
+   */
   protected def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
     homepage := Some(url(s"https://github.com/biopet/${biopetUrlName.value}")),
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
@@ -98,6 +116,9 @@ object BiopetPlugin extends AutoPlugin {
     biopetIsTool := false // This should not have to be defined for utils.
   )
 
+  /*
+   * A sequence of settings specific to release
+   */
   protected def biopetReleaseSettings: Seq[Setting[_]] = Seq(
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
@@ -106,6 +127,15 @@ object BiopetPlugin extends AutoPlugin {
     useGpg := true,
     releaseProcess := biopetReleaseProcess
   )
+
+  /*
+   * A sequence of settings related to documentation.
+   * This includes all the settings for
+   *  - LAIKA
+   *  - Ghpagesplugin
+   *  - Our custom documentation generation code
+   *  - SBT-site
+   */
   protected def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
@@ -124,6 +154,10 @@ object BiopetPlugin extends AutoPlugin {
     makeSite := (makeSite dependsOn biopetGenerateDocs).value,
     ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
+
+  /*
+   * The merge strategy that is used in biopet projects
+   */
   protected def biopetMergeStrategy: String => MergeStrategy = {
     case PathList(ps @ _ *) if ps.last endsWith "pom.properties" =>
       MergeStrategy.first
@@ -154,6 +188,10 @@ object BiopetPlugin extends AutoPlugin {
       }
     case _ => MergeStrategy.first
   }
+
+  /*
+   * Biopet resolver.
+   */
   protected def biopetPublishTo: Def.Initialize[Option[Resolver]] =
     Def.setting {
       if (isSnapshot.value)
@@ -162,6 +200,9 @@ object BiopetPlugin extends AutoPlugin {
         Some(Opts.resolver.sonatypeStaging)
     }
 
+  /*
+   * The ReleaseProcess for use with the sbt-release plugin
+   */
   protected def biopetReleaseProcess: Seq[ReleaseStep] = {
     Seq[ReleaseStep](
       releaseStepCommand("git fetch"),
@@ -186,6 +227,13 @@ object BiopetPlugin extends AutoPlugin {
       pushChanges
     )
   }
+
+  /*
+   * The filter that is used by the ghpages plugin.
+   * All files in this filter will be removed.
+   * This allows the updating of documentation for a specific version
+   * All other versions will not be touched.
+   */
   protected def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
     Def.setting {
       new FileFilter {
@@ -200,6 +248,10 @@ object BiopetPlugin extends AutoPlugin {
         }
       }
     }
+
+  /*
+   * Accesses the tools main method to generate documentation using our custom built-in documentation function
+   */
   protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
       if (biopetIsTool.value) {
@@ -220,6 +272,10 @@ object BiopetPlugin extends AutoPlugin {
           .foreach(sys.error)
       }
     }
+
+  /*
+   * Accesses the tools main method to generate a README using our custom built-in documentation function
+   */
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
       if (biopetIsTool.value) {
