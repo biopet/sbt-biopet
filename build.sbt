@@ -10,11 +10,10 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 useGpg := true
 
 publishTo := {
-  val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
+    Some(Opts.resolver.sonatypeSnapshots)
   else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    Some(Opts.resolver.sonatypeStaging)
 }
 
 import ReleaseTransformations._
