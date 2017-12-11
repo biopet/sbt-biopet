@@ -13,16 +13,14 @@ node('local') {
         stage('Build') {
             sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean compile"
         }
-        stage('Test') {sh "echo moo"}
-        /*
-        * stage('Test') {
-        *     sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors coverageOn test coverageReport coverageAggregate"
-        * }
-        */
+        stage('Test') {
+            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors coverageOn scripted coverageReport coverageAggregate"
+        }
+
 
         stage('Results') {
             step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.11/scoverage-report/', reportFile: 'scoverage.xml'])
-            /* junit '**/test-output/junitreports/*.xml' */
+            junit '**/test-output/junitreports/*.xml'
         }
 
         if (currentBuild.result == null || "SUCCESS" == currentBuild.result) {
@@ -40,7 +38,7 @@ node('local') {
             slackSend(color: '#FFFF00', message: "${currentBuild.result}: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
         }
 
-        /* junit '**/test-output/junitreports/*.xml' */
+        junit '**/test-output/junitreports/*.xml'
 
         throw e
     }
