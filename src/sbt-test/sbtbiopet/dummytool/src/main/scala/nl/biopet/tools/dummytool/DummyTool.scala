@@ -1,4 +1,4 @@
-package nl.biopet.tools.tooltemplate
+package nl.biopet.tools.dummytool
 
 import nl.biopet.utils.tool.ToolCommand
 
