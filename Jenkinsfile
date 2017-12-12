@@ -8,6 +8,7 @@ node('local') {
             tool 'sbt 0.13.15'
             checkout scm
             sh 'git submodule update --init --recursive'
+            sh 'rm -r $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         }
 
         stage('Build & Test') {
