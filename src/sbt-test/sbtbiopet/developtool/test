@@ -2,10 +2,8 @@
 > assembly
 $ exists target/scala-2.11/DummyTool-assembly-0.1-SNAPSHOT.jar
 
-> publishLocal
+> package
 $ exists target/scala-2.11/dummytool_2.11-0.1-SNAPSHOT.jar
-$ exists target/scala-2.11/ivy-0.1-SNAPSHOT.xml
-$ exists target/scala-2.11/dummytool_2.11-0.1-SNAPSHOT.pom
 
 # Test generation of documentation
 > makeSite
