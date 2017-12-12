@@ -8,19 +8,19 @@ node('local') {
             tool 'sbt 0.13.15'
             checkout scm
             sh 'git submodule update --init --recursive'
+            // Remove sbt-biopet plugin from cache.
+            sh 'rm -rf $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         }
 
-        stage('Build') {
-            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean compile"
-        }
-
-        stage('Test') {
-            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors coverageOn test coverageReport coverageAggregate"
+        stage('Build & Test') {
+            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean scripted"
         }
 
         stage('Results') {
-            step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.11/scoverage-report/', reportFile: 'scoverage.xml'])
-            junit '**/test-output/junitreports/*.xml'
+            //step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.11/scoverage-report/', reportFile: 'scoverage.xml'])
+            //junit '**/test-output/junitreports/*.xml'
+            // Remove locally published sbt-biopet plugin from cache to avoid conflicts with other tools.
+            sh 'rm -rf $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         }
 
         if (currentBuild.result == null || "SUCCESS" == currentBuild.result) {
@@ -38,7 +38,7 @@ node('local') {
             slackSend(color: '#FFFF00', message: "${currentBuild.result}: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
         }
 
-        junit '**/test-output/junitreports/*.xml'
+        //junit '**/test-output/junitreports/*.xml'
 
         throw e
     }

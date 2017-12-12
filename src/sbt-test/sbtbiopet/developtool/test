@@ -1,0 +1,15 @@
+# Test assembly
+> assembly
+$ exists target/scala-2.11/DummyTool-assembly-0.1-SNAPSHOT.jar
+
+> package
+$ exists target/scala-2.11/dummytool_2.11-0.1-SNAPSHOT.jar
+
+# Test generation of documentation
+> makeSite
+$ exists target/markdown/develop/index.md
+$ exists target/laikaSite/develop/index.html
+$ exists target/site/develop/api/index.html
+$ exists target/site/develop/index.html
+> biopetGenerateReadme
+$ exists README.md
