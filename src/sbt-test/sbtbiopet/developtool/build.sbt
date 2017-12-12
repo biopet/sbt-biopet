@@ -1,5 +1,4 @@
 lazy val root = (project in file(".")).settings(
-  version := "0.1-SNAPSHOT",
   name := "DummyTool",
   biopetUrlName := "dummytool",
   biopetIsTool := true,
