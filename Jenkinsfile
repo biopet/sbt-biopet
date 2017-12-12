@@ -17,7 +17,7 @@ node('local') {
 
         stage('Results') {
             //step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.11/scoverage-report/', reportFile: 'scoverage.xml'])
-            junit '**/test-output/junitreports/*.xml'
+            //junit '**/test-output/junitreports/*.xml'
         }
 
         if (currentBuild.result == null || "SUCCESS" == currentBuild.result) {
@@ -35,7 +35,7 @@ node('local') {
             slackSend(color: '#FFFF00', message: "${currentBuild.result}: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
         }
 
-        junit '**/test-output/junitreports/*.xml'
+        //junit '**/test-output/junitreports/*.xml'
 
         throw e
     }
