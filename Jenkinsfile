@@ -8,6 +8,7 @@ node('local') {
             tool 'sbt 0.13.15'
             checkout scm
             sh 'git submodule update --init --recursive'
+            // Remove sbt-biopet plugin from cache.
             sh 'rm -r $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         }
 
@@ -18,6 +19,8 @@ node('local') {
         stage('Results') {
             //step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.11/scoverage-report/', reportFile: 'scoverage.xml'])
             //junit '**/test-output/junitreports/*.xml'
+            // Remove locally published sbt-biopet plugin from cache to avoid conflicts with other tools.
+            sh 'rm -r $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         }
 
         if (currentBuild.result == null || "SUCCESS" == currentBuild.result) {
