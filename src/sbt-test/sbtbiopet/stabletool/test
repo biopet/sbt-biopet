@@ -6,7 +6,7 @@
 > checkValues
 
 # Test generation of documentation
-# Documentation is generated differently if not isSnaphot
+# Documentation is generated differently if not isSnapshot
 > makeSite
 $ exists target/markdown/0.1/index.md
 $ exists target/markdown/index.html
