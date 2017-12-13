@@ -1,9 +1,22 @@
+# Check if values have been inherited correctly
+> checkValues
+
 # Test assembly
 > assembly
 $ exists target/scala-2.11/DummyTool-assembly-0.1-SNAPSHOT.jar
 
+# Check packaging
 > package
 $ exists target/scala-2.11/dummytool_2.11-0.1-SNAPSHOT.jar
+
+#Check if scalafmt works
+> scalafmt
+
+# Check if coverage works
+> coverage
+> test
+> coverageReport
+> coverageAggregate
 
 # Test generation of documentation
 > makeSite

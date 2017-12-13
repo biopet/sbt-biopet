@@ -17,6 +17,7 @@ TaskKey[Unit]("checkValues") := {
   assert(homepage.value == validHomePage, s"'${homepage.value}' does not equal '$validHomePage'")
   assert(useGpg.value, "useGpg should be true")
   assert(biopetIsTool.value, "biopetIsTool should be true")
+  assert(publishMavenStyle.value, "publishMavenStyle should be true")
   assert(resolvers.value.contains(Resolver.sonatypeRepo("snapshots")), "'snapshots' not present in 'resolvers'")
   assert(resolvers.value.contains(Resolver.sonatypeRepo("releases")), "'releases' not present in 'resolvers'")
   assert(publishTo.value ==
