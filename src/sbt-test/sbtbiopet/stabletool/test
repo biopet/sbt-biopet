@@ -14,3 +14,5 @@ $ exists target/site/0.1/api/index.html
 $ exists target/site/0.1/index.html
 > biopetGenerateReadme
 $ exists README.md
+> scalafmt
+> checkValues
