@@ -99,4 +99,3 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   )
 )
-

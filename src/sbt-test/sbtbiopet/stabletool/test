@@ -1,11 +1,12 @@
-# Test assembly
-> assembly
-$ exists target/scala-2.11/DummyTool-assembly-0.1.jar
+# Only tests with results different from that of developtool should
+# be integrated here to avoid duplication of tests.
 
-> package
-$ exists target/scala-2.11/dummytool_2.11-0.1.jar
+# Check if values have been inherited correctly
+# Values are slightly different dependent on isSnapshot
+> checkValues
 
 # Test generation of documentation
+# Documentation is generated differently if not isSnapshot
 > makeSite
 $ exists target/markdown/0.1/index.md
 $ exists target/markdown/index.html
