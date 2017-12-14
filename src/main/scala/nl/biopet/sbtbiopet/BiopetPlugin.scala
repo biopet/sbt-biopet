@@ -57,6 +57,8 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseProcess,
   releaseStepCommand
 }
+import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -102,6 +104,8 @@ object BiopetPlugin extends AutoPlugin {
       ScalafmtSbtPlugin.projectSettings ++
       CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
+      HeaderPlugin.projectSettings ++
+      AutomateHeaderPlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
