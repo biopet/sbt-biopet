@@ -1,1 +1,0 @@
-../developtool/version.sbt
