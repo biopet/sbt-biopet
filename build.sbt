@@ -3,7 +3,7 @@ name := "sbt-biopet"
 
 homepage := Some(url(s"https://github.com/biopet/sbt-biopet"))
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
-organizationName := "Biopet"
+organizationName := "Sequencing Analysis Support Core - Leiden University Medical Center"
 scmInfo := Some(
   ScmInfo(
     url("https://github.com/biopet/sbt-biopet"),
