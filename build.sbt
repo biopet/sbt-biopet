@@ -1,6 +1,23 @@
 organization := "com.github.biopet"
 name := "sbt-biopet"
 
+homepage := Some(url(s"https://github.com/biopet/sbt-biopet"))
+licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
+
+scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/biopet/sbt-biopet"),
+    "scm:git@github.com:biopet/sbt-biopet.git"
+  )
+)
+
+developers := List(
+  Developer(id="ffinfo", name="Peter van 't Hof", email="pjrvanthof@gmail.com", url=url("https://github.com/ffinfo")),
+  Developer(id="rhpvorderman", name="Ruben Vorderman", email="r.h.p.vorderman@lumc.nl", url=url("https://github.com/rhpvorderman"))
+)
+
+publishMavenStyle := true
+
 sbtPlugin := true
 
 scalaVersion := "2.10.6"
