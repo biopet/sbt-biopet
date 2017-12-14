@@ -1,11 +1,6 @@
 # Check if values have been inherited correctly
 > checkValues
 
-# Check headerPlugin
--> headerCheck
-> headerCreate
-> headerCheck
-
 # Test assembly
 > assembly
 $ exists target/scala-2.11/DummyTool-assembly-0.1-SNAPSHOT.jar
