@@ -21,8 +21,6 @@
 
 package nl.biopet.sbtbiopet
 
-import scoverage.ScoverageSbtPlugin
-import org.scoverage.coveralls.CoverallsPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
@@ -41,7 +39,10 @@ import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
+import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerCreate
 import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
+import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport.{
@@ -57,8 +58,7 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseProcess,
   releaseStepCommand
 }
-import de.heikoseeberger.sbtheader.HeaderPlugin
-import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
+import scoverage.ScoverageSbtPlugin
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -105,11 +105,11 @@ object BiopetPlugin extends AutoPlugin {
       CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
-      AutomateHeaderPlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
-      biopetDocumentationSettings
+      biopetDocumentationSettings ++
+      biopetHeaderSettings
   }
 
   /*
@@ -119,6 +119,11 @@ object BiopetPlugin extends AutoPlugin {
     Seq(
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
+
+  /*
+   * Contains al settings related to the license header
+   */
+  protected def biopetHeaderSettings: Seq[Setting[_]] = Nil
 
   /*
    * A sequence of settings containing information such as homepage, licences and git related information.
