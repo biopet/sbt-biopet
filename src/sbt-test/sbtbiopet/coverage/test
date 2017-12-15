@@ -1,0 +1,6 @@
+# Check if coverage works
+> coverage
+> test
+> coverageReport
+> coverageAggregate
+

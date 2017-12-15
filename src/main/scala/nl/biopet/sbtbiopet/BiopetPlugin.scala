@@ -1,7 +1,26 @@
+/*
+ * Copyright (c) 2017 Sequencing Analysis Support Core - Leiden University Medical Center
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package nl.biopet.sbtbiopet
 
-import scoverage.ScoverageSbtPlugin
-import org.scoverage.coveralls.CoverallsPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
@@ -20,7 +39,9 @@ import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
+import de.heikoseeberger.sbtheader.HeaderPlugin
 import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
+import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport.{
@@ -36,6 +57,7 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseProcess,
   releaseStepCommand
 }
+import scoverage.ScoverageSbtPlugin
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -81,10 +103,12 @@ object BiopetPlugin extends AutoPlugin {
       ScalafmtSbtPlugin.projectSettings ++
       CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
+      HeaderPlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
-      biopetDocumentationSettings
+      biopetDocumentationSettings ++
+      biopetHeaderSettings
   }
 
   /*
@@ -95,6 +119,10 @@ object BiopetPlugin extends AutoPlugin {
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
 
+  /*
+   * Contains al settings related to the license header
+   */
+  protected def biopetHeaderSettings: Seq[Setting[_]] = Nil
   /*
    * A sequence of settings containing information such as homepage, licences and git related information.
    */

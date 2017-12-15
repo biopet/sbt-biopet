@@ -1,5 +1,8 @@
 lazy val root = (project in file(".")).settings(
   name := "DummyTool",
+  organizationName := "Dummy Organization",
+  organization := "example.dummy",
+  startYear := Some(2017),
   biopetUrlName := "dummytool",
   biopetIsTool := true,
   mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool"),

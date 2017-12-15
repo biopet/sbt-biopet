@@ -3,13 +3,14 @@ name := "sbt-biopet"
 
 homepage := Some(url(s"https://github.com/biopet/sbt-biopet"))
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
-
+organizationName := "Sequencing Analysis Support Core - Leiden University Medical Center"
 scmInfo := Some(
   ScmInfo(
     url("https://github.com/biopet/sbt-biopet"),
     "scm:git@github.com:biopet/sbt-biopet.git"
   )
 )
+startYear := some(2017)
 
 developers := List(
   Developer(id="ffinfo", name="Peter van 't Hof", email="pjrvanthof@gmail.com", url=url("https://github.com/ffinfo")),
@@ -107,6 +108,11 @@ libraryDependencies ++= Seq(
   ),
   Defaults.sbtPluginExtra(
     "org.scoverage" % "sbt-scoverage" % "1.5.1",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "de.heikoseeberger" % "sbt-header" % "4.0.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),

@@ -1,0 +1,7 @@
+# Test assembly
+> assembly
+$ exists target/scala-2.11/DummyTool-assembly-0.1-SNAPSHOT.jar
+
+# Check packaging
+> package
+$ exists target/scala-2.11/dummytool_2.11-0.1-SNAPSHOT.jar
