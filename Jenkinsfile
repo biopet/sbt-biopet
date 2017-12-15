@@ -13,7 +13,8 @@ node('local') {
         }
 
         stage('Build & Test') {
-            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean scripted headerCheck"
+            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean scalafmt scripted headerCheck"
+            sh "git diff --exit-code || (echo \"ERROR: Git changes detected, please regenerate the readme and run scalafmt with: sbt generateReadme scalafmt\" && exit 1)"
         }
 
         stage('Results') {
@@ -38,6 +39,7 @@ node('local') {
             slackSend(color: '#FFFF00', message: "${currentBuild.result}: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
         }
 
+        sh 'rm -rf $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         //junit '**/test-output/junitreports/*.xml'
 
         throw e
