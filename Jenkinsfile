@@ -14,7 +14,7 @@ node('local') {
 
         stage('Build & Test') {
             sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors clean scalafmt scripted headerCheck"
-            sh "git diff --exit-code || (echo \"ERROR: Git changes detected, please regenerate the readme and run scalafmt with: sbt generateReadme scalafmt\" && exit 1)"
+            sh "git diff --exit-code || (echo \"ERROR: Git changes detected, please regenerate the readme and run scalafmt with: sbt headerCreate scalafmt\" && exit 1)"
         }
 
         stage('Results') {
