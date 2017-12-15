@@ -128,11 +128,13 @@ object BiopetPlugin extends AutoPlugin {
    */
   protected def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
     githubOrganization := "biopet",
-    homepage := Some(url(s"https://github.com/${githubOrganization.value}/${biopetUrlName.value}")),
+    homepage := Some(url(
+      s"https://github.com/${githubOrganization.value}/${biopetUrlName.value}")),
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     scmInfo := Some(
       ScmInfo(
-        url(s"https://github.com/${githubOrganization.value}/${biopetUrlName.value}"),
+        url(
+          s"https://github.com/${githubOrganization.value}/${biopetUrlName.value}"),
         s"scm:git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git"
       )),
     git.remoteRepo := s"git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git",
