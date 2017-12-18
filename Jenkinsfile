@@ -8,8 +8,8 @@ node('local') {
             tool 'sbt 0.13.15'
             checkout scm
             sh 'git submodule update --init --recursive'
-            // Remove sbt-biopet plugin from cache.
-            sh 'rm -rf $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
+            // Remove sbt-biopet SNAPSHOT plugin from cache.
+            sh 'rm -rf $HOME/.ivy2/cache/scala_*/sbt_*/com.github.biopet/sbt-biopet/*SNAPSHOT*'
         }
 
         stage('Build & Test') {
@@ -38,8 +38,8 @@ node('local') {
         } else {
             slackSend(color: '#FFFF00', message: "${currentBuild.result}: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
         }
-
-        sh 'rm -rf $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
+        // Remove sbt-biopet SNAPSHOT plugin from cache.
+        sh 'rm -rf $HOME/.ivy2/cache/scala_*/sbt_*/com.github.biopet/sbt-biopet/*SNAPSHOT*'
         //junit '**/test-output/junitreports/*.xml'
 
         throw e
