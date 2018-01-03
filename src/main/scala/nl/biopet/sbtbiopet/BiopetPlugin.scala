@@ -281,7 +281,7 @@ object BiopetPlugin extends AutoPlugin {
     Def.task[Unit] {
       if (biopetIsTool.value) {
         import Attributed.data
-        val r = (runner in Runtime).value
+        val r = (runner in Compile).value
         val args = Seq("--generateDocs",
                        s"outputDir=${biopetDocsDir.value.toString}," +
                          s"version=${version.value}," +
@@ -302,19 +302,21 @@ object BiopetPlugin extends AutoPlugin {
    * Accesses the tools main method to generate a README using our custom built-in documentation function
    */
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
-    Def.task[Unit] {
-      if (biopetIsTool.value) {
-        import sbt.Attributed.data
-        val r: ScalaRun = (runner in Runtime).value
-        val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-        val classPath = (fullClasspath in Runtime).value
-        r.run(
-            s"${(mainClass in assembly).value.get}",
-            data(classPath),
-            args,
-            streams.value.log
-          )
-          .foreach(sys.error)
+    Def
+      .task[Unit] {
+        if (biopetIsTool.value) {
+          import sbt.Attributed.data
+          val r: ScalaRun = (runner in Compile).value
+          val args = Seq("--generateReadme", biopetReadmePath.value.toString)
+          val classPath = (fullClasspath in Runtime).value
+          r.run(
+              s"${(mainClass in assembly).value.get}",
+              data(classPath),
+              args,
+              streams.value.log
+            )
+            .foreach(sys.error)
+        }
       }
-    }
+      .dependsOn(compile in Compile)
 }
