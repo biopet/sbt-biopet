@@ -281,7 +281,7 @@ object BiopetPlugin extends AutoPlugin {
     Def.task[Unit] {
       if (biopetIsTool.value) {
         import Attributed.data
-        val r = (runner in Runtime).value
+        val r = (runner in Compile).value
         val args = Seq("--generateDocs",
                        s"outputDir=${biopetDocsDir.value.toString}," +
                          s"version=${version.value}," +
@@ -305,7 +305,7 @@ object BiopetPlugin extends AutoPlugin {
     Def.task[Unit] {
       if (biopetIsTool.value) {
         import sbt.Attributed.data
-        val r: ScalaRun = (runner in Runtime).value
+        val r: ScalaRun = (runner in Compile).value
         val args = Seq("--generateReadme", biopetReadmePath.value.toString)
         val classPath = (fullClasspath in Runtime).value
         r.run(
@@ -316,5 +316,5 @@ object BiopetPlugin extends AutoPlugin {
           )
           .foreach(sys.error)
       }
-    }
+    }.dependsOn(compile in Compile)
 }
