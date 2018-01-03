@@ -9,7 +9,7 @@ node('local') {
             checkout scm
             sh 'git submodule update --init --recursive'
             // Remove sbt-biopet SNAPSHOT plugin from cache.
-            sh 'rm -rf $HOME/.ivy2/cache/scala_*/sbt_*/com.github.biopet/sbt-biopet/*SNAPSHOT*'
+            sh 'rm -rf $HOME/.ivy2/cache/scala_*/sbt_*/com.github.biopet/sbt-biopet/*/*SNAPSHOT*'
         }
 
         stage('Build & Test') {
