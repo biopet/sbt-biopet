@@ -209,7 +209,7 @@ object BiopetPlugin extends AutoPlugin {
           MergeStrategy.filterDistinctLines
         case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
           MergeStrategy.filterDistinctLines
-        case _ => MergeStrategy.deduplicate
+        case _ => MergeStrategy.first
       }
     case _ => MergeStrategy.first
   }
