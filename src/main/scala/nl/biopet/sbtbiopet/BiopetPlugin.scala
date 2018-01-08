@@ -50,7 +50,7 @@ import sbtassembly.AssemblyPlugin.autoImport.{
   assembly,
   assemblyMergeStrategy
 }
-import sbtassembly.MergeStrategy
+import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport.{
   ReleaseStep,
@@ -62,7 +62,9 @@ import scoverage.ScoverageSbtPlugin
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
 
-  override def requires: Plugins = empty
+  override def requires: Plugins =
+    empty &&
+      AssemblyPlugin
 
   override lazy val globalSettings: Seq[Setting[_]] = biopetGlobalSettings
   override lazy val projectSettings: Seq[Setting[_]] = biopetProjectSettings
@@ -77,6 +79,8 @@ object BiopetPlugin extends AutoPlugin {
    */
   def biopetGlobalSettings: Seq[Setting[_]] = {
     super.globalSettings ++
+      GhpagesPlugin.globalSettings ++
+      AssemblyPlugin.globalSettings ++
       ScoverageSbtPlugin.globalSettings // Having seen the source I dare not put this in project settings
   }
 
@@ -84,7 +88,7 @@ object BiopetPlugin extends AutoPlugin {
    * Settings to be added to the build scope. Settings here are applied only once.
    */
   def biopetBuildSettings: Seq[Setting[_]] = {
-    super.buildSettings ++
+    super.buildSettings ++ AssemblyPlugin.buildSettings ++
       ScoverageSbtPlugin.buildSettings
   }
 
@@ -96,8 +100,8 @@ object BiopetPlugin extends AutoPlugin {
       // Importing globalSettings into projectSettings,
       // it does not change functionality, and removes those nasty
       // global variables.
-      GhpagesPlugin.globalSettings ++
       SitePlugin.projectSettings ++
+      AssemblyPlugin.projectSettings ++
       SiteScaladocPlugin.projectSettings ++
       LaikaSitePlugin.projectSettings ++
       ScalafmtSbtPlugin.projectSettings ++
@@ -209,7 +213,7 @@ object BiopetPlugin extends AutoPlugin {
           MergeStrategy.filterDistinctLines
         case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
           MergeStrategy.filterDistinctLines
-        case _ => MergeStrategy.deduplicate
+        case _ => MergeStrategy.first
       }
     case _ => MergeStrategy.first
   }
