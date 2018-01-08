@@ -62,7 +62,9 @@ import scoverage.ScoverageSbtPlugin
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
 
-  override def requires: Plugins = empty
+  override def requires: Plugins =
+    empty &&
+      AssemblyPlugin
 
   override lazy val globalSettings: Seq[Setting[_]] = biopetGlobalSettings
   override lazy val projectSettings: Seq[Setting[_]] = biopetProjectSettings
