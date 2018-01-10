@@ -21,7 +21,7 @@ publishMavenStyle := true
 
 sbtPlugin := true
 
-scalaVersion := "2.10.6"
+scalaVersion := "2.12.3"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
@@ -34,7 +34,6 @@ publishTo := {
     Some(Opts.resolver.sonatypeStaging)
 }
 
-ScriptedPlugin.scriptedSettings
 scriptedLaunchOpts := { scriptedLaunchOpts.value ++
   Seq("-Xmx1024M",
     "-Dplugin.version=" + version.value)
@@ -72,22 +71,22 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "org.planet42" % "laika-sbt" % "0.7.0",
+    "org.planet42" % "laika-sbt" % "0.7.5",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.eed3si9n" % "sbt-assembly" % "0.14.5",
+    "com.eed3si9n" % "sbt-assembly" % "0.14.6",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.jsuereth" % "sbt-pgp" % "1.0.0",
+    "com.jsuereth" % "sbt-pgp" % "1.1.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "org.xerial.sbt" % "sbt-sonatype" % "1.1",
+    "org.xerial.sbt" % "sbt-sonatype" % "2.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
@@ -97,7 +96,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.github.gseitz" % "sbt-release" % "1.0.6",
+    "com.github.gseitz" % "sbt-release" % "1.0.7",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
@@ -112,12 +111,12 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "de.heikoseeberger" % "sbt-header" % "4.0.0",
+    "de.heikoseeberger" % "sbt-header" % "4.1.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.lucidchart" % "sbt-scalafmt" % "1.10",
+    "com.lucidchart" % "sbt-scalafmt" % "1.15",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   )
