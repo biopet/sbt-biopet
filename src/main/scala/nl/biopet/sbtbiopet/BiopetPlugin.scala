@@ -283,20 +283,22 @@ object BiopetPlugin extends AutoPlugin {
    */
   protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
+      val r = (runner in Compile).value
+      val classPath = (fullClasspath in Runtime).value
+      val mainClassString =  s"${(mainClass in assembly).value.get}"
+      val streamsLogValue = streams.value.log
       if (biopetIsTool.value) {
         import Attributed.data
-        val r = (runner in Compile).value
         val args = Seq("--generateDocs",
                        s"outputDir=${biopetDocsDir.value.toString}," +
                          s"version=${version.value}," +
                          s"release=${!isSnapshot.value}",
                        version.value)
-        val classPath = (fullClasspath in Runtime).value
         r.run(
-            s"${(mainClass in assembly).value.get}",
+            mainClassString,
             data(classPath),
             args,
-            streams.value.log
+          streamsLogValue
           )
       }
     }
@@ -307,16 +309,18 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
     Def
       .task[Unit] {
+        val r: ScalaRun = (runner in Compile).value
+        val classPath = (fullClasspath in Runtime).value
+        val mainClassString =  s"${(mainClass in assembly).value.get}"
+        val streamsLogValue = streams.value.log
         if (biopetIsTool.value) {
           import sbt.Attributed.data
-          val r: ScalaRun = (runner in Compile).value
           val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-          val classPath = (fullClasspath in Runtime).value
           r.run(
-              s"${(mainClass in assembly).value.get}",
+              mainClassString,
               data(classPath),
               args,
-              streams.value.log
+            streamsLogValue
           )
         }
       }
