@@ -40,7 +40,7 @@ import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin
-import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
+import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
@@ -175,7 +175,7 @@ object BiopetPlugin extends AutoPlugin {
     siteSubdirName in SiteScaladoc := {
       if (isSnapshot.value) { "develop/api" } else s"${version.value}/api"
     },
-    rawContent in Laika := true, //Laika use raw HTML content in markdown.
+    laikaRawContent in Laika := true, //Laika use raw HTML content in markdown.
     includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
     biopetGenerateReadme := biopetGenerateReadmeFunction().value,
@@ -298,7 +298,6 @@ object BiopetPlugin extends AutoPlugin {
             args,
             streams.value.log
           )
-          .foreach(sys.error)
       }
     }
 
@@ -318,8 +317,7 @@ object BiopetPlugin extends AutoPlugin {
               data(classPath),
               args,
               streams.value.log
-            )
-            .foreach(sys.error)
+          )
         }
       }
       .dependsOn(compile in Compile)

@@ -91,7 +91,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.typesafe.sbt" % "sbt-site" % "1.3.1",
+    "com.typesafe.sbt" % "sbt-site" % "1.3.2-SNAPSHOT",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
