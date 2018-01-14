@@ -291,7 +291,7 @@ object BiopetPlugin extends AutoPlugin {
                          s"version=${version.value}," +
                          s"release=${!isSnapshot.value}",
                        version.value)
-        val classPath = (fullClasspath in Runtime).value
+        val classPath = (fullClasspath in Compile).value
         r.run(
             s"${(mainClass in assembly).value.get}",
             data(classPath),
@@ -312,7 +312,7 @@ object BiopetPlugin extends AutoPlugin {
           import sbt.Attributed.data
           val r: ScalaRun = (runner in Compile).value
           val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-          val classPath = (fullClasspath in Runtime).value
+          val classPath = (fullClasspath in Compile).value
           r.run(
               s"${(mainClass in assembly).value.get}",
               data(classPath),
