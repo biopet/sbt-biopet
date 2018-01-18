@@ -14,3 +14,23 @@ libraryDependencies += "org.yaml" % "snakeyaml" % "1.17"
 libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.25"
 libraryDependencies += "com.github.biopet" %% "test-utils" % "0.2" % Test
 
+
+TaskKey[Unit]("checkValues") := {
+  val validGitRepo = "git@github.com:biopet/dummy-util.git"
+  val validHomePage = Some(url("https://github.com/biopet/dummy-tool"))
+
+  assert(git.remoteRepo.value == validGitRepo, s"'${git.remoteRepo.value}' does not equal '$validGitRepo'")
+  assert(homepage.value == validHomePage, s"'${homepage.value}' does not equal '$validHomePage'")
+  assert(useGpg.value, "useGpg should be true")
+  assert(biopetIsTool.value, "biopetIsTool should be true")
+  assert(publishMavenStyle.value, "publishMavenStyle should be true")
+  assert(resolvers.value.contains(Resolver.sonatypeRepo("snapshots")), "'snapshots' not present in 'resolvers'")
+  assert(resolvers.value.contains(Resolver.sonatypeRepo("releases")), "'releases' not present in 'resolvers'")
+  assert(publishTo.value ==
+    Def.setting {
+      if (isSnapshot.value)
+        Some(Opts.resolver.sonatypeSnapshots)
+      else
+        Some(Opts.resolver.sonatypeStaging)
+    }.value, "publishTo has incorrect value")
+}
