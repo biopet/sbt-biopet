@@ -17,7 +17,7 @@ libraryDependencies += "com.github.biopet" %% "test-utils" % "0.2" % Test
 
 TaskKey[Unit]("checkValues") := {
   val validGitRepo = "git@github.com:biopet/dummy-util.git"
-  val validHomePage = Some(url("https://github.com/biopet/dummy-tool"))
+  val validHomePage = Some(url("https://github.com/biopet/dummy-util"))
 
   assert(git.remoteRepo.value == validGitRepo, s"'${git.remoteRepo.value}' does not equal '$validGitRepo'")
   assert(homepage.value == validHomePage, s"'${homepage.value}' does not equal '$validHomePage'")

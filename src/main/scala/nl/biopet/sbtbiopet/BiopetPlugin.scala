@@ -173,8 +173,17 @@ object BiopetPlugin extends AutoPlugin {
     siteDirectory in Laika := file(target.value.toString + "/site"),
     ghpagesRepository := file(target.value.toString + "/gh"),
     siteSubdirName in SiteScaladoc := {
-      if (isSnapshot.value) { "develop/api" } else s"${version.value}/api"
-    },
+      if (biopetIsTool.value) {
+        if (isSnapshot.value) {
+          "develop/api"
+        } else s"${version.value}/api"
+      }
+      else {
+        if (isSnapshot.value){
+          "develop/"
+        }
+        else s"${version.value}"
+      }},
     rawContent in Laika := true, //Laika use raw HTML content in markdown.
     includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
