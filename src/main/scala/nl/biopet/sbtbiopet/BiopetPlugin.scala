@@ -92,7 +92,6 @@ object BiopetPlugin extends AutoPlugin {
       ScoverageSbtPlugin.buildSettings ++
       Seq(
         commands += Command.command("biopetTest") { state =>
-          "clean" ::
             "scalafmt" ::
             "headerCreate" ::
             "coverage" ::
