@@ -89,7 +89,20 @@ object BiopetPlugin extends AutoPlugin {
    */
   def biopetBuildSettings: Seq[Setting[_]] = {
     super.buildSettings ++ AssemblyPlugin.buildSettings ++
-      ScoverageSbtPlugin.buildSettings
+      ScoverageSbtPlugin.buildSettings ++
+      Seq(
+        commands += Command.command("biopetTest") { state =>
+          "scalafmt" ::
+            "headerCreate" ::
+            "coverage" ::
+            "test" ::
+            "coverageReport" ::
+            "coverageAggregate" ::
+            "makeSite" ::
+            "biopetGenerateReadme" ::
+            state
+        }
+      )
   }
 
   /*
