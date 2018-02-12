@@ -25,8 +25,16 @@ import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesPushSite, ghpagesRepository}
-import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
+  ghpagesCleanSite,
+  ghpagesPushSite,
+  ghpagesRepository
+}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{
+  makeSite,
+  siteDirectory,
+  siteSubdirName
+}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
@@ -36,10 +44,19 @@ import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
-import sbtassembly.AssemblyPlugin.autoImport.{Assembly, PathList, assembly, assemblyMergeStrategy}
+import sbtassembly.AssemblyPlugin.autoImport.{
+  Assembly,
+  PathList,
+  assembly,
+  assemblyMergeStrategy
+}
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
+import sbtrelease.ReleasePlugin.autoImport.{
+  ReleaseStep,
+  releaseProcess,
+  releaseStepCommand
+}
 import scoverage.ScoverageSbtPlugin
 
 object BiopetPlugin extends AutoPlugin {
@@ -273,55 +290,75 @@ object BiopetPlugin extends AutoPlugin {
       }
     }
 
-  protected def runMainClass(args: Seq[String]): Def.Initialize[Task[Unit]] =
-    Def.taskDyn {
-      if (biopetIsTool.value) {
-        Def.task[Unit] {
-          val r = (runner in Compile).value
-          val classPath = (fullClasspath in Runtime).value
-
-          val streamsLogValue = streams.value.log
-
-          val mainClassString = (mainClass in assembly).value match {
-            case Some(x) => x
-            case _ =>
-              throw new IllegalStateException(
-                "Mainclass should be defined for a tool.")
-          }
-          import Attributed.data
-          r.run(
-            mainClassString,
-            data(classPath),
-            args,
-            streamsLogValue
-          )
-
-        }.dependsOn(compile in Compile)
-      }
-      else Def.task[Unit] {}
-    }
-
-
   /*
    * Accesses the tools main method to generate documentation using our custom built-in documentation function
    */
   protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
-        Def.task[Unit] {
-          val args = Seq("--generateDocs",
-            s"outputDir=${biopetDocsDir.value.toString}," +
-              s"version=${version.value}," +
-              s"release=${!isSnapshot.value}",
-            version.value)
-          runMainClass(args).value
-        }
+    Def.taskDyn {
+      if (biopetIsTool.value) {
+        Def
+          .task[Unit] {
+            val r = (runner in Compile).value
+            val classPath = (fullClasspath in Runtime).value
+
+            val streamsLogValue = streams.value.log
+
+            val args = Seq("--generateDocs",
+                           s"outputDir=${biopetDocsDir.value.toString}," +
+                             s"version=${version.value}," +
+                             s"release=${!isSnapshot.value}",
+                           version.value)
+
+            val mainClassString = (mainClass in assembly).value match {
+              case Some(x) => x
+              case _ =>
+                throw new IllegalStateException(
+                  "Mainclass should be defined for a tool.")
+            }
+            import Attributed.data
+            r.run(
+              mainClassString,
+              data(classPath),
+              args,
+              streamsLogValue
+            )
+
+          }
+          .dependsOn(compile in Compile)
+      } else Def.task[Unit] {}
+    }
 
   /*
    * Accesses the tools main method to generate a README using our custom built-in documentation function
    */
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
+    Def.taskDyn {
+      if (biopetIsTool.value) {
         Def
           .task[Unit] {
-          val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-          runMainClass(args).value
-        }
+            val r = (runner in Compile).value
+            val classPath = (fullClasspath in Runtime).value
+
+            val args = Seq("--generateReadme", biopetReadmePath.value.toString)
+
+            val streamsLogValue = streams.value.log
+
+            val mainClassString = (mainClass in assembly).value match {
+              case Some(x) => x
+              case _ =>
+                throw new IllegalStateException(
+                  "Mainclass should be defined for a tool.")
+            }
+            import Attributed.data
+            r.run(
+              mainClassString,
+              data(classPath),
+              args,
+              streamsLogValue
+            )
+
+          }
+          .dependsOn(compile in Compile)
+      } else Def.task[Unit] {}
+    }
 }
