@@ -182,7 +182,7 @@ object BiopetPlugin extends AutoPlugin {
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
     sourceDirectory in LaikaSite := {
-      if (biopetIsTool.value) biopetDocsDir.value else file(s"${scalaBinaryVersion.value}")
+      if (biopetIsTool.value) biopetDocsDir.value else file(s"scala-${scalaBinaryVersion.value}")
     },
     sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
     siteDirectory in Laika := file(target.value.toString + "/site"),
