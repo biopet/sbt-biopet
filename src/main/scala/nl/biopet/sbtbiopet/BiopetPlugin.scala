@@ -190,13 +190,12 @@ object BiopetPlugin extends AutoPlugin {
         if (isSnapshot.value) {
           "develop/api"
         } else s"${version.value}/api"
-      }
-      else {
-        if (isSnapshot.value){
+      } else {
+        if (isSnapshot.value) {
           "develop/"
-        }
-        else s"${version.value}"
-      }},
+        } else s"${version.value}"
+      }
+    },
     laikaRawContent in Laika := true, //Laika use raw HTML content in markdown.
     includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
