@@ -297,9 +297,15 @@ object BiopetPlugin extends AutoPlugin {
     Def.task[Unit] {
       val r = (runner in Compile).value
       val classPath = (fullClasspath in Runtime).value
-      val mainClassString = s"${(mainClass in assembly).value.get}"
+
       val streamsLogValue = streams.value.log
       if (biopetIsTool.value) {
+        val mainClassString = (mainClass in assembly).value match {
+          case Some(x) => x
+          case _ =>
+            throw new IllegalStateException(
+              "Mainclass should be defined for a tool.")
+        }
         import Attributed.data
         val args = Seq("--generateDocs",
                        s"outputDir=${biopetDocsDir.value.toString}," +
@@ -323,7 +329,12 @@ object BiopetPlugin extends AutoPlugin {
       .task[Unit] {
         val r: ScalaRun = (runner in Compile).value
         val classPath = (fullClasspath in Runtime).value
-        val mainClassString = s"${(mainClass in assembly).value.get}"
+        val mainClassString = (mainClass in assembly).value match {
+          case Some(x) => x
+          case _ =>
+            throw new IllegalStateException(
+              "Mainclass should be defined for a tool.")
+        }
         val streamsLogValue = streams.value.log
         if (biopetIsTool.value) {
           import sbt.Attributed.data
