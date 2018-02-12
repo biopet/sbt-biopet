@@ -181,7 +181,9 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
     biopetDocsDir := file("%s/markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
-    sourceDirectory in LaikaSite := biopetDocsDir.value,
+    sourceDirectory in LaikaSite := {
+      if (biopetIsTool.value) biopetDocsDir.value else file(s"${scalaBinaryVersion.value}")
+    },
     sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
     siteDirectory in Laika := file(target.value.toString + "/site"),
     ghpagesRepository := file(target.value.toString + "/gh"),
