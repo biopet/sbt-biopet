@@ -290,35 +290,45 @@ object BiopetPlugin extends AutoPlugin {
       }
     }
 
+  protected def runMainClass(args: Seq[String]): Def.Initialize[Task[Unit]] = {
+    Def.taskDyn[Unit] {
+      Def
+        .task[Unit] {
+          val r = (runner in Compile).value
+          val classPath = (fullClasspath in Runtime).value
+
+          val streamsLogValue = streams.value.log
+          if (biopetIsTool.value) {
+            val mainClassString = (mainClass in assembly).value match {
+              case Some(x) => x
+              case _ =>
+                throw new IllegalStateException(
+                  "Mainclass should be defined for a tool.")
+            }
+            import Attributed.data
+            r.run(
+              mainClassString,
+              data(classPath),
+              args,
+              streamsLogValue
+            )
+          }
+        }
+        .dependsOn(compile in Compile)
+    }
+  }
+
   /*
    * Accesses the tools main method to generate documentation using our custom built-in documentation function
    */
   protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
     Def.task[Unit] {
-      val r = (runner in Compile).value
-      val classPath = (fullClasspath in Runtime).value
-
-      val streamsLogValue = streams.value.log
-      if (biopetIsTool.value) {
-        val mainClassString = (mainClass in assembly).value match {
-          case Some(x) => x
-          case _ =>
-            throw new IllegalStateException(
-              "Mainclass should be defined for a tool.")
-        }
-        import Attributed.data
-        val args = Seq("--generateDocs",
-                       s"outputDir=${biopetDocsDir.value.toString}," +
-                         s"version=${version.value}," +
-                         s"release=${!isSnapshot.value}",
-                       version.value)
-        r.run(
-          mainClassString,
-          data(classPath),
-          args,
-          streamsLogValue
-        )
-      }
+      val args = Seq("--generateDocs",
+                     s"outputDir=${biopetDocsDir.value.toString}," +
+                       s"version=${version.value}," +
+                       s"release=${!isSnapshot.value}",
+                     version.value)
+      runMainClass(args).value
     }
 
   /*
@@ -327,25 +337,7 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
     Def
       .task[Unit] {
-        val r: ScalaRun = (runner in Compile).value
-        val classPath = (fullClasspath in Runtime).value
-        val mainClassString = (mainClass in assembly).value match {
-          case Some(x) => x
-          case _ =>
-            throw new IllegalStateException(
-              "Mainclass should be defined for a tool.")
-        }
-        val streamsLogValue = streams.value.log
-        if (biopetIsTool.value) {
-          import sbt.Attributed.data
-          val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-          r.run(
-            mainClassString,
-            data(classPath),
-            args,
-            streamsLogValue
-          )
-        }
+        val args = Seq("--generateReadme", biopetReadmePath.value.toString)
+        runMainClass(args).value
       }
-      .dependsOn(compile in Compile)
 }
