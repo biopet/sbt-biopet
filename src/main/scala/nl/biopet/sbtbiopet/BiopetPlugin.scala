@@ -40,7 +40,7 @@ import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin
-import laika.sbt.LaikaSbtPlugin.LaikaKeys.{Laika, rawContent}
+import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
@@ -197,7 +197,7 @@ object BiopetPlugin extends AutoPlugin {
         }
         else s"${version.value}"
       }},
-    rawContent in Laika := true, //Laika use raw HTML content in markdown.
+    laikaRawContent in Laika := true, //Laika use raw HTML content in markdown.
     includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
     biopetGenerateReadme := biopetGenerateReadmeFunction().value,
@@ -210,16 +210,16 @@ object BiopetPlugin extends AutoPlugin {
    * The merge strategy that is used in biopet projects
    */
   protected def biopetMergeStrategy: String => MergeStrategy = {
-    case PathList(ps @ _ *) if ps.last endsWith "pom.properties" =>
+    case PathList(ps @ _*) if ps.last endsWith "pom.properties" =>
       MergeStrategy.first
-    case PathList(ps @ _ *) if ps.last endsWith "pom.xml" =>
+    case PathList(ps @ _*) if ps.last endsWith "pom.xml" =>
       MergeStrategy.first
     case x if Assembly.isConfigFile(x) =>
       MergeStrategy.concat
-    case PathList(ps @ _ *)
+    case PathList(ps @ _*)
         if Assembly.isReadme(ps.last) || Assembly.isLicenseFile(ps.last) =>
       MergeStrategy.rename
-    case PathList("META-INF", xs @ _ *) =>
+    case PathList("META-INF", xs @ _*) =>
       xs map {
         _.toLowerCase
       } match {
@@ -293,8 +293,7 @@ object BiopetPlugin extends AutoPlugin {
             f.getPath.contains("develop")
           } else {
             f.getPath.contains(s"${version.value}") ||
-            f.getPath == new java.io.File(ghpagesRepository.value,
-                                          "index.html").getPath
+            f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
           }
         }
       }
@@ -304,45 +303,71 @@ object BiopetPlugin extends AutoPlugin {
    * Accesses the tools main method to generate documentation using our custom built-in documentation function
    */
   protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
-    Def.task[Unit] {
+    Def.taskDyn {
       if (biopetIsTool.value) {
-        import Attributed.data
-        val r = (runner in Compile).value
-        val args = Seq("--generateDocs",
-                       s"outputDir=${biopetDocsDir.value.toString}," +
-                         s"version=${version.value}," +
-                         s"release=${!isSnapshot.value}",
-                       version.value)
-        val classPath = (fullClasspath in Compile).value
-        r.run(
-            s"${(mainClass in assembly).value.get}",
-            data(classPath),
-            args,
-            streams.value.log
-          )
-          .foreach(sys.error)
-      }
+        Def
+          .task[Unit] {
+            val r = (runner in Compile).value
+            val classPath = (fullClasspath in Runtime).value
+
+            val streamsLogValue = streams.value.log
+
+            val args = Seq("--generateDocs",
+                           s"outputDir=${biopetDocsDir.value.toString}," +
+                             s"version=${version.value}," +
+                             s"release=${!isSnapshot.value}",
+                           version.value)
+
+            val mainClassString = (mainClass in assembly).value match {
+              case Some(x) => x
+              case _ =>
+                throw new IllegalStateException(
+                  "Mainclass should be defined for a tool.")
+            }
+            import Attributed.data
+            r.run(
+              mainClassString,
+              data(classPath),
+              args,
+              streamsLogValue
+            )
+
+          }
+          .dependsOn(compile in Compile)
+      } else Def.task[Unit] {}
     }
 
   /*
    * Accesses the tools main method to generate a README using our custom built-in documentation function
    */
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
-    Def
-      .task[Unit] {
-        if (biopetIsTool.value) {
-          import sbt.Attributed.data
-          val r: ScalaRun = (runner in Compile).value
-          val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-          val classPath = (fullClasspath in Compile).value
-          r.run(
-              s"${(mainClass in assembly).value.get}",
+    Def.taskDyn {
+      if (biopetIsTool.value) {
+        Def
+          .task[Unit] {
+            val r = (runner in Compile).value
+            val classPath = (fullClasspath in Runtime).value
+
+            val args = Seq("--generateReadme", biopetReadmePath.value.toString)
+
+            val streamsLogValue = streams.value.log
+
+            val mainClassString = (mainClass in assembly).value match {
+              case Some(x) => x
+              case _ =>
+                throw new IllegalStateException(
+                  "Mainclass should be defined for a tool.")
+            }
+            import Attributed.data
+            r.run(
+              mainClassString,
               data(classPath),
               args,
-              streams.value.log
+              streamsLogValue
             )
-            .foreach(sys.error)
-        }
-      }
-      .dependsOn(compile in Compile)
+
+          }
+          .dependsOn(compile in Compile)
+      } else Def.task[Unit] {}
+    }
 }
