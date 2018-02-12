@@ -201,16 +201,16 @@ object BiopetPlugin extends AutoPlugin {
    * The merge strategy that is used in biopet projects
    */
   protected def biopetMergeStrategy: String => MergeStrategy = {
-    case PathList(ps @ _ *) if ps.last endsWith "pom.properties" =>
+    case PathList(ps @ _*) if ps.last endsWith "pom.properties" =>
       MergeStrategy.first
-    case PathList(ps @ _ *) if ps.last endsWith "pom.xml" =>
+    case PathList(ps @ _*) if ps.last endsWith "pom.xml" =>
       MergeStrategy.first
     case x if Assembly.isConfigFile(x) =>
       MergeStrategy.concat
-    case PathList(ps @ _ *)
+    case PathList(ps @ _*)
         if Assembly.isReadme(ps.last) || Assembly.isLicenseFile(ps.last) =>
       MergeStrategy.rename
-    case PathList("META-INF", xs @ _ *) =>
+    case PathList("META-INF", xs @ _*) =>
       xs map {
         _.toLowerCase
       } match {
@@ -284,8 +284,7 @@ object BiopetPlugin extends AutoPlugin {
             f.getPath.contains("develop")
           } else {
             f.getPath.contains(s"${version.value}") ||
-            f.getPath == new java.io.File(ghpagesRepository.value,
-                                          "index.html").getPath
+            f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
           }
         }
       }
@@ -298,7 +297,7 @@ object BiopetPlugin extends AutoPlugin {
     Def.task[Unit] {
       val r = (runner in Compile).value
       val classPath = (fullClasspath in Runtime).value
-      val mainClassString =  s"${(mainClass in assembly).value.get}"
+      val mainClassString = s"${(mainClass in assembly).value.get}"
       val streamsLogValue = streams.value.log
       if (biopetIsTool.value) {
         import Attributed.data
@@ -308,11 +307,11 @@ object BiopetPlugin extends AutoPlugin {
                          s"release=${!isSnapshot.value}",
                        version.value)
         r.run(
-            mainClassString,
-            data(classPath),
-            args,
+          mainClassString,
+          data(classPath),
+          args,
           streamsLogValue
-          )
+        )
       }
     }
 
@@ -324,15 +323,15 @@ object BiopetPlugin extends AutoPlugin {
       .task[Unit] {
         val r: ScalaRun = (runner in Compile).value
         val classPath = (fullClasspath in Runtime).value
-        val mainClassString =  s"${(mainClass in assembly).value.get}"
+        val mainClassString = s"${(mainClass in assembly).value.get}"
         val streamsLogValue = streams.value.log
         if (biopetIsTool.value) {
           import sbt.Attributed.data
           val args = Seq("--generateReadme", biopetReadmePath.value.toString)
           r.run(
-              mainClassString,
-              data(classPath),
-              args,
+            mainClassString,
+            data(classPath),
+            args,
             streamsLogValue
           )
         }
