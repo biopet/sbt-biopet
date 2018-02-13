@@ -24,6 +24,10 @@ node('local') {
             sh 'rm -rf $HOME/.ivy2/cache/scala_2.10/sbt_0.13/com.github.biopet/sbt-biopet'
         }
 
+        if (env.BRANCH_NAME == 'develop') stage('Publish') {
+            sh "${tool name: 'sbt 0.13.15', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt -no-colors publishSigned"
+        }
+
         if (currentBuild.result == null || "SUCCESS" == currentBuild.result) {
             currentBuild.result = "SUCCESS"
             slackSend(color: '#00FF00', message: "${currentBuild.result}: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
