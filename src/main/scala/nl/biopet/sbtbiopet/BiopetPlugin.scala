@@ -227,12 +227,12 @@ object BiopetPlugin extends AutoPlugin {
         case ("manifest.mf" :: Nil) | ("index.list" :: Nil) |
             ("dependencies" :: Nil) =>
           MergeStrategy.discard
-        case ps @ (x :: xs)
+        case ps @ (_ :: _)
             if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
           MergeStrategy.discard
-        case "plexus" :: xs =>
+        case "plexus" :: _ =>
           MergeStrategy.discard
-        case "services" :: xs =>
+        case "services" :: _ =>
           MergeStrategy.filterDistinctLines
         case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
           MergeStrategy.filterDistinctLines
