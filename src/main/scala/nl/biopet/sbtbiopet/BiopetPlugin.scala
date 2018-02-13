@@ -22,6 +22,7 @@
 package nl.biopet.sbtbiopet
 
 import java.io.PrintWriter
+
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
@@ -334,17 +335,17 @@ object BiopetPlugin extends AutoPlugin {
 
           }
           .dependsOn(compile in Compile)
-      } else Def.task[Unit] {
-        biopetDocsDir.value.mkdirs()
-        if (!isSnapshot.value) {
-          val htmlRedirectFile: sbt.File = biopetDocsDir.value / "index.html"
-          htmlRedirector(outputFile = htmlRedirectFile,
-            link = s"${version.value}/index.html",
-            title = "API documentation",
-            redirectText = "Go to the API documentation"
-          )
+      } else
+        Def.task[Unit] {
+          biopetDocsDir.value.mkdirs()
+          if (!isSnapshot.value) {
+            val htmlRedirectFile: sbt.File = biopetDocsDir.value / "index.html"
+            htmlRedirector(outputFile = htmlRedirectFile,
+                           link = s"${version.value}/index.html",
+                           title = "API documentation",
+                           redirectText = "Go to the API documentation")
+          }
         }
-      }
     }
 
   /*
@@ -389,11 +390,11 @@ object BiopetPlugin extends AutoPlugin {
     * @param redirectText If javascript does not work, this link text is displayed.
     */
   def htmlRedirector(
-                      outputFile: File,
-                      link: String,
-                      title: String = "Project Documentation",
-                      redirectText: String = "Go to the project documentation"
-                    ): Unit = {
+      outputFile: File,
+      link: String,
+      title: String = "Project Documentation",
+      redirectText: String = "Go to the project documentation"
+  ): Unit = {
     val fileWriter = new PrintWriter(outputFile)
     val redirectHtml: String =
       s"""<!DOCTYPE html>
