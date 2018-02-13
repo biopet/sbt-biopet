@@ -27,8 +27,16 @@ import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesPushSite, ghpagesRepository}
-import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
+  ghpagesCleanSite,
+  ghpagesPushSite,
+  ghpagesRepository
+}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{
+  makeSite,
+  siteDirectory,
+  siteSubdirName
+}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
@@ -37,14 +45,29 @@ import de.heikoseeberger.sbtheader.HeaderPlugin
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import ohnosequences.sbt.GithubRelease
 import ohnosequences.sbt.SbtGithubReleasePlugin
-import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport.{ghreleaseGithubToken, ghreleaseNotes, ghreleaseRepoName, ghreleaseRepoOrg, ghreleaseTitle}
+import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport.{
+  ghreleaseGithubToken,
+  ghreleaseNotes,
+  ghreleaseRepoName,
+  ghreleaseRepoOrg,
+  ghreleaseTitle
+}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
-import sbtassembly.AssemblyPlugin.autoImport.{Assembly, PathList, assembly, assemblyMergeStrategy}
+import sbtassembly.AssemblyPlugin.autoImport.{
+  Assembly,
+  PathList,
+  assembly,
+  assemblyMergeStrategy
+}
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
+import sbtrelease.ReleasePlugin.autoImport.{
+  ReleaseStep,
+  releaseProcess,
+  releaseStepCommand
+}
 import scoverage.ScoverageSbtPlugin
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -159,11 +182,15 @@ object BiopetPlugin extends AutoPlugin {
       s"${name.value} $tagName"
     },
     // ghreleaseNotes generic message. (Empty message leads to prompt).
-    ghreleaseNotes := { tagName => s"Release ${tagName.stripPrefix("v")}"},
+    ghreleaseNotes := { tagName =>
+      s"Release ${tagName.stripPrefix("v")}"
+    },
     // ghreleaseGithubToken copied from default for stability.
     ghreleaseGithubToken := {
-      GithubRelease.defs.githubTokenFromEnv(GithubRelease.defs.defaultTokenEnvVar) orElse
-        GithubRelease.defs.githubTokenFromFile(GithubRelease.defs.defaultTokenFile)
+      GithubRelease.defs.githubTokenFromEnv(
+        GithubRelease.defs.defaultTokenEnvVar) orElse
+        GithubRelease.defs.githubTokenFromFile(
+          GithubRelease.defs.defaultTokenFile)
     },
     releaseProcess := biopetReleaseProcess
   )
