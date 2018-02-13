@@ -8,18 +8,6 @@ package object utils {
     Option(getClass.getPackage.getImplementationVersion)
       .getOrElse("unpackaged")
 
-  def textToSize(text: String): Long = {
-    text.last match {
-      case 'g' | 'G' =>
-        ((1L << 30) * text.stripSuffix("g").stripSuffix("G").toDouble).toLong
-      case 'm' | 'M' =>
-        ((1L << 20) * text.stripSuffix("m").stripSuffix("M").toDouble).toLong
-      case 'k' | 'K' =>
-        ((1L << 10) * text.stripSuffix("k").stripSuffix("K").toDouble).toLong
-      case _ => text.toLong
-    }
-  }
-
   /** Converts string with underscores into camel-case strings */
   def camelize(ustring: String): String =
     ustring
