@@ -58,6 +58,8 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseStepCommand
 }
 import scoverage.ScoverageSbtPlugin
+import ohnosequences.sbt.SbtGithubReleasePlugin
+import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport.{ghreleaseRepoName,ghreleaseRepoName,ghreleaseTitle,ghreleaseNotes,githubRelease}
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -110,9 +112,6 @@ object BiopetPlugin extends AutoPlugin {
    */
   def biopetProjectSettings: Seq[Setting[_]] = {
     GhpagesPlugin.projectSettings ++
-      // Importing globalSettings into projectSettings,
-      // it does not change functionality, and removes those nasty
-      // global variables.
       SitePlugin.projectSettings ++
       AssemblyPlugin.projectSettings ++
       SiteScaladocPlugin.projectSettings ++
@@ -121,6 +120,7 @@ object BiopetPlugin extends AutoPlugin {
       CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
+      SbtGithubReleasePlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
@@ -167,6 +167,7 @@ object BiopetPlugin extends AutoPlugin {
     publishTo := biopetPublishTo.value,
     publishMavenStyle := true,
     useGpg := true,
+    gh
     releaseProcess := biopetReleaseProcess
   )
 

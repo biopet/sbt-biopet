@@ -119,5 +119,10 @@ libraryDependencies ++= Seq(
     "com.lucidchart" % "sbt-scalafmt" % "1.15",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "ohnosequences" % "sbt-github-release" % "0.7.0",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
   )
 )
