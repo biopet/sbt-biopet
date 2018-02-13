@@ -21,7 +21,7 @@
 
 package nl.biopet.sbtbiopet
 
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
 
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
@@ -181,20 +181,22 @@ object BiopetPlugin extends AutoPlugin {
    *  - SBT-site
    */
   protected def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
-    biopetDocsDir := file("%s/markdown".format(target.value.toString)),
+    biopetDocsDir := file(
+      s"%s${File.separator}markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
     sourceDirectory in LaikaSite := biopetDocsDir.value,
     sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
-    siteDirectory in Laika := file(target.value.toString + "/site"),
-    ghpagesRepository := file(target.value.toString + "/gh"),
+    siteDirectory in Laika := file(
+      target.value.toString + s"${File.separator}site"),
+    ghpagesRepository := file(target.value.toString + s"${File.separator}gh"),
     siteSubdirName in SiteScaladoc := {
       if (biopetIsTool.value) {
         if (isSnapshot.value) {
-          "develop/api"
-        } else s"${version.value}/api"
+          s"develop${File.separator}api"
+        } else s"${version.value}${File.separator}api"
       } else {
         if (isSnapshot.value) {
-          "develop/"
+          "develop"
         } else s"${version.value}"
       }
     },
@@ -340,10 +342,11 @@ object BiopetPlugin extends AutoPlugin {
           biopetDocsDir.value.mkdirs()
           if (!isSnapshot.value) {
             val htmlRedirectFile: sbt.File = biopetDocsDir.value / "index.html"
-            htmlRedirector(outputFile = htmlRedirectFile,
-                           link = s"${version.value}/index.html",
-                           title = "API documentation",
-                           redirectText = "Go to the API documentation")
+            htmlRedirector(
+              outputFile = htmlRedirectFile,
+              link = s"${version.value}${File.separator}index.html",
+              title = "API documentation",
+              redirectText = "Go to the API documentation")
           }
         }
     }
