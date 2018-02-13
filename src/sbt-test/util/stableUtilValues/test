@@ -1,0 +1,3 @@
+# Check if values have been inherited correctly
+# Values are slightly different dependent on isSnapshot
+> checkValues

@@ -21,6 +21,8 @@
 
 package nl.biopet.sbtbiopet
 
+import java.io.{File, PrintWriter}
+
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
@@ -179,14 +181,24 @@ object BiopetPlugin extends AutoPlugin {
    *  - SBT-site
    */
   protected def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
-    biopetDocsDir := file("%s/markdown".format(target.value.toString)),
+    biopetDocsDir := file(
+      s"%s${File.separator}markdown".format(target.value.toString)),
     biopetReadmePath := file("README.md").getAbsoluteFile,
     sourceDirectory in LaikaSite := biopetDocsDir.value,
     sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
-    siteDirectory in Laika := file(target.value.toString + "/site"),
-    ghpagesRepository := file(target.value.toString + "/gh"),
+    siteDirectory in Laika := file(
+      target.value.toString + s"${File.separator}site"),
+    ghpagesRepository := file(target.value.toString + s"${File.separator}gh"),
     siteSubdirName in SiteScaladoc := {
-      if (isSnapshot.value) { "develop/api" } else s"${version.value}/api"
+      if (biopetIsTool.value) {
+        if (isSnapshot.value) {
+          s"develop${File.separator}api"
+        } else s"${version.value}${File.separator}api"
+      } else {
+        if (isSnapshot.value) {
+          "develop"
+        } else s"${version.value}"
+      }
     },
     laikaRawContent in Laika := true, //Laika use raw HTML content in markdown.
     includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
@@ -217,12 +229,12 @@ object BiopetPlugin extends AutoPlugin {
         case ("manifest.mf" :: Nil) | ("index.list" :: Nil) |
             ("dependencies" :: Nil) =>
           MergeStrategy.discard
-        case ps @ (x :: xs)
+        case ps @ (_ :: _)
             if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
           MergeStrategy.discard
-        case "plexus" :: xs =>
+        case "plexus" :: _ =>
           MergeStrategy.discard
-        case "services" :: xs =>
+        case "services" :: _ =>
           MergeStrategy.filterDistinctLines
         case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
           MergeStrategy.filterDistinctLines
@@ -325,7 +337,18 @@ object BiopetPlugin extends AutoPlugin {
 
           }
           .dependsOn(compile in Compile)
-      } else Def.task[Unit] {}
+      } else
+        Def.task[Unit] {
+          biopetDocsDir.value.mkdirs()
+          if (!isSnapshot.value) {
+            val htmlRedirectFile: sbt.File = biopetDocsDir.value / "index.html"
+            htmlRedirector(
+              outputFile = htmlRedirectFile,
+              link = s"${version.value}${File.separator}index.html",
+              title = "API documentation",
+              redirectText = "Go to the API documentation")
+          }
+        }
     }
 
   /*
@@ -361,4 +384,44 @@ object BiopetPlugin extends AutoPlugin {
           .dependsOn(compile in Compile)
       } else Def.task[Unit] {}
     }
+
+  /**
+    * Generates a htmlPage that redirects automatically to the link provided.
+    * @param outputFile The file that will contain the redirect, for example: some_dir/index.html
+    * @param link The file to redirect to, for example: ../index.html
+    * @param title The title of the page.
+    * @param redirectText If javascript does not work, this link text is displayed.
+    */
+  def htmlRedirector(
+      outputFile: File,
+      link: String,
+      title: String = "Project Documentation",
+      redirectText: String = "Go to the project documentation"
+  ): Unit = {
+    val fileWriter = new PrintWriter(outputFile)
+    val redirectHtml: String =
+      s"""<!DOCTYPE html>
+         |<html lang="en">
+         |<head>
+         |    <meta charset="UTF-8">
+         |    <title>$title</title>
+         |    <script language="JavaScript">
+         |        <!--
+         |        function doRedirect()
+         |        {
+         |            window.location.replace("$link");
+         |        }
+         |        doRedirect();
+         |        //-->
+         |    </script>
+         |</head>
+         |<body>
+         |<a href="$link">$redirectText
+         |</a>
+         |</body>
+         |</html>
+       """.stripMargin
+    fileWriter.print(redirectHtml)
+    fileWriter.close()
+  }
 }
