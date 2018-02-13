@@ -1,1 +1,1 @@
-../developUtil/version.sbt
+../stableUtilDocumentation/version.sbt

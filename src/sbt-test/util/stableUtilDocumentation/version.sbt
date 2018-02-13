@@ -1,1 +1,1 @@
-../developUtil/version.sbt
+version := "0.3"
