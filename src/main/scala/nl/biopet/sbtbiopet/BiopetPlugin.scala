@@ -43,6 +43,7 @@ import de.heikoseeberger.sbtheader.HeaderPlugin
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import ohnosequences.sbt.SbtGithubReleasePlugin
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport.{
+  ghreleaseNotes,
   ghreleaseRepoName,
   ghreleaseRepoOrg,
   ghreleaseTitle
@@ -176,6 +177,12 @@ object BiopetPlugin extends AutoPlugin {
     ghreleaseTitle := { tagName =>
       s"${name.value} $tagName"
     },
+    // ghreleaseNotes same as upstream default.
+    ghreleaseNotes := { tagName =>
+      val ver = tagName.stripPrefix("v")
+      IO.read(baseDirectory.value / "notes" / s"${ver}.markdown")
+    },
+
     releaseProcess := biopetReleaseProcess
   )
 
