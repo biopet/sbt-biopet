@@ -21,7 +21,7 @@ publishMavenStyle := true
 
 sbtPlugin := true
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.4"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
@@ -117,6 +117,11 @@ libraryDependencies ++= Seq(
   ),
   Defaults.sbtPluginExtra(
     "com.lucidchart" % "sbt-scalafmt" % "1.15",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.timushev.sbt" % "sbt-updates" % "0.3.4",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   )
