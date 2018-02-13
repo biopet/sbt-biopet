@@ -1,0 +1,6 @@
+# Test generation of documentation
+> makeSite
+$ exists target/site/0.3/index.html
+$ exists target/site/index.html
+> biopetGenerateReadme
+

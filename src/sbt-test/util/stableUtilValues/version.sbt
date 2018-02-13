@@ -1,0 +1,1 @@
+../stableUtilDocumentation/version.sbt
