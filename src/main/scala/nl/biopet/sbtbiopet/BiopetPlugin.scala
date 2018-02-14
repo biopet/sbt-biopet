@@ -43,15 +43,8 @@ import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
-import ohnosequences.sbt.GithubRelease
-import ohnosequences.sbt.SbtGithubReleasePlugin
-import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport.{
-  ghreleaseGithubToken,
-  ghreleaseNotes,
-  ghreleaseRepoName,
-  ghreleaseRepoOrg,
-  ghreleaseTitle
-}
+import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
+import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
