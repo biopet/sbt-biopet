@@ -43,6 +43,8 @@ import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
+import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
+import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
@@ -60,7 +62,6 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseStepCommand
 }
 import scoverage.ScoverageSbtPlugin
-
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
 
@@ -112,9 +113,6 @@ object BiopetPlugin extends AutoPlugin {
    */
   def biopetProjectSettings: Seq[Setting[_]] = {
     GhpagesPlugin.projectSettings ++
-      // Importing globalSettings into projectSettings,
-      // it does not change functionality, and removes those nasty
-      // global variables.
       SitePlugin.projectSettings ++
       AssemblyPlugin.projectSettings ++
       SiteScaladocPlugin.projectSettings ++
@@ -123,6 +121,7 @@ object BiopetPlugin extends AutoPlugin {
       CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
+      SbtGithubReleasePlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
@@ -169,6 +168,23 @@ object BiopetPlugin extends AutoPlugin {
     publishTo := biopetPublishTo.value,
     publishMavenStyle := true,
     useGpg := true,
+    ghreleaseRepoName := biopetUrlName.value,
+    ghreleaseRepoOrg := githubOrganization.value,
+    //ghreleaseTitle same as upstream default. Specified here to be stable between releases.
+    ghreleaseTitle := { tagName =>
+      s"${name.value} $tagName"
+    },
+    // ghreleaseNotes generic message. (Empty message leads to prompt).
+    ghreleaseNotes := { tagName =>
+      s"Release ${tagName.stripPrefix("v")}"
+    },
+    // ghreleaseGithubToken copied from default for stability.
+    ghreleaseGithubToken := {
+      GithubRelease.defs.githubTokenFromEnv(
+        GithubRelease.defs.defaultTokenEnvVar) orElse
+        GithubRelease.defs.githubTokenFromFile(
+          GithubRelease.defs.defaultTokenFile)
+    },
     releaseProcess := biopetReleaseProcess
   )
 
@@ -274,6 +290,7 @@ object BiopetPlugin extends AutoPlugin {
       releaseStepCommand("sonatypeReleaseAll"),
       releaseStepCommand("ghpagesPushSite"),
       pushChanges,
+      releaseStepCommand("githubRelease"),
       releaseStepCommand("git checkout develop"),
       releaseStepCommand("git merge master"),
       setNextVersion,

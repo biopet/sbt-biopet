@@ -122,5 +122,10 @@ libraryDependencies ++= Seq(
     "com.timushev.sbt" % "sbt-updates" % "0.3.4",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "ohnosequences" % "sbt-github-release" % "0.7.0",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
   )
 )
