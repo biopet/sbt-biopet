@@ -335,7 +335,7 @@ object BiopetPlugin extends AutoPlugin {
         Def
           .task[Unit] {
             val r = (runner in Compile).value
-            val classPath = (fullClasspath in Runtime).value
+            val classPath = (fullClasspath in Compile).value
 
             val streamsLogValue = streams.value.log
 
@@ -384,7 +384,7 @@ object BiopetPlugin extends AutoPlugin {
         Def
           .task[Unit] {
             val r = (runner in Compile).value
-            val classPath = (fullClasspath in Runtime).value
+            val classPath = (fullClasspath in Compile).value
 
             val args = Seq("--generateReadme", biopetReadmePath.value.toString)
 
