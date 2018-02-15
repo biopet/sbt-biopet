@@ -134,7 +134,8 @@ object BiopetPlugin extends AutoPlugin {
       biopetAssemblySettings ++
       biopetReleaseSettings ++
       biopetDocumentationSettings ++
-      biopetHeaderSettings
+      biopetHeaderSettings ++
+      biopetScalafmtSettings
   }
 
   /*
