@@ -1,2 +1,5 @@
+# Check if scalafmt runs on compile during testing.
+> test
+
 #Check if biopetTest works
 > biopetTest
