@@ -12,8 +12,16 @@ scmInfo := Some(
 )
 startYear := some(2017)
 
-developers += Developer(id="ffinfo", name="Peter van 't Hof", email="pjrvanthof@gmail.com", url=url("https://github.com/ffinfo"))
-developers += Developer(id="rhpvorderman", name="Ruben Vorderman", email="r.h.p.vorderman@lumc.nl", url=url("https://github.com/rhpvorderman"))
+developers := List(
+  Developer(id = "ffinfo",
+            name = "Peter van 't Hof",
+            email = "pjrvanthof@gmail.com",
+            url = url("https://github.com/ffinfo")),
+  Developer(id = "rhpvorderman",
+            name = "Ruben Vorderman",
+            email = "r.h.p.vorderman@lumc.nl",
+            url = url("https://github.com/rhpvorderman"))
+)
 
 publishMavenStyle := true
 
@@ -25,6 +33,11 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 useGpg := true
 
+scalafmt := (scalafmt in Compile)
+  .dependsOn(scalafmt in Test)
+  .dependsOn(scalafmt in Sbt)
+  .value
+
 publishTo := {
   if (isSnapshot.value)
     Some(Opts.resolver.sonatypeSnapshots)
@@ -32,9 +45,9 @@ publishTo := {
     Some(Opts.resolver.sonatypeStaging)
 }
 
-scriptedLaunchOpts := { scriptedLaunchOpts.value ++
-  Seq("-Xmx1024M",
-    "-Dplugin.version=" + version.value)
+scriptedLaunchOpts := {
+  scriptedLaunchOpts.value ++
+    Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
 }
 scriptedBufferLog := false
 
