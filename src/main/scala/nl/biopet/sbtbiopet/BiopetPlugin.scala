@@ -23,7 +23,6 @@ package nl.biopet.sbtbiopet
 
 import java.io.{File, PrintWriter}
 
-import scala.util.matching.Regex
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
   scalafmtOnCompile
@@ -47,18 +46,16 @@ import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
-import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
+  HeaderCommentStyle,
   headerCheck,
   headerCreate,
-  headerMappings,
-  headerSettings,
-  HeaderFileType,
-  HeaderCommentStyle
+  headerMappings
 }
+import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
-import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
+import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
@@ -161,25 +158,21 @@ object BiopetPlugin extends AutoPlugin {
     Seq(
       // headerMappings for other filetypes
       headerMappings := headerMappings.value +
-        (FileType("html",Some("^<!DOCTYPE html>$\\n".r)) -> HeaderCommentStyle.xmlStyleBlockComment) +
+        (FileType("html", Some("^<!DOCTYPE html>$\\n".r)) -> HeaderCommentStyle.xmlStyleBlockComment) +
         (FileType("css") -> HeaderCommentStyle.cStyleBlockComment) +
         (FileType.sh -> HeaderCommentStyle.hashLineComment) +
         (FileType("yml") -> HeaderCommentStyle.hashLineComment) +
-        (FileType(".sbt") -> HeaderCommentStyle.cStyleBlockComment),
-
+        (FileType("sbt") -> HeaderCommentStyle.cStyleBlockComment),
       // add files to have header created
       unmanagedSources in (Compile, headerCreate) ++= {
         (unmanagedResources in Compile).value ++ //Add resources
-          new ProjectDefinitionUtil(thisProject.value).sbtFiles.toSeq //Add sbt files
+          (sources in (Sbt, scalafmt)).value //Add sbt files
       },
-
       // add test resources
       unmanagedResources in (Test, headerCreate) ++= (unmanagedResources in Test).value,
-
       // Make sure headerCheck checks the same things as headerCreate
-      unmanagedResources in (Compile,headerCheck) := (unmanagedResources in (Compile, headerCreate)).value,
-        unmanagedResources in (Test,headerCheck) := (unmanagedResources in (Test, headerCreate)).value,
-
+      unmanagedResources in (Compile, headerCheck) := (unmanagedResources in (Compile, headerCreate)).value,
+      unmanagedResources in (Test, headerCheck) := (unmanagedResources in (Test, headerCreate)).value,
       // Run headerCreate and Headercheck on all configurations
       headerCreate := (headerCreate in Compile)
         .dependsOn(headerCreate in Test)
