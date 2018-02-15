@@ -24,6 +24,8 @@ package nl.biopet.sbtbiopet
 import java.io.{File, PrintWriter}
 
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
+import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{scalafmtOnCompile,scalafmt}
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
@@ -209,6 +211,13 @@ object BiopetPlugin extends AutoPlugin {
     ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
 
+  protected def biopetScalafmtSettings: Seq[Setting[_]] = Seq(
+    scalafmtOnCompile := true,
+    scalafmt := (scalafmt in Compile)
+      .dependsOn(scalafmt in Test)
+      .dependsOn(scalafmt in Sbt)
+      .value
+  )
   /*
    * The merge strategy that is used in biopet projects
    */
@@ -291,7 +300,7 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
     Def.setting {
       new FileFilter {
-        def accept(f: File) = {
+        def accept(f: File): Boolean = {
           if (isSnapshot.value) {
             f.getPath.contains("develop")
           } else {

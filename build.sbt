@@ -27,6 +27,12 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 useGpg := true
 
+
+scalafmt := (scalafmt in Compile)
+  .dependsOn(scalafmt in Test)
+  .dependsOn(scalafmt in Sbt)
+  .value
+
 publishTo := {
   if (isSnapshot.value)
     Some(Opts.resolver.sonatypeSnapshots)
