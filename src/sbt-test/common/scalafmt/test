@@ -1,5 +1,5 @@
 #Check if scalafmt works
--> sbt:scalafmt::test
+> sbt:scalafmt::test
 > test:scalafmt::test
 > scalafmt::test
 > scalafmt
