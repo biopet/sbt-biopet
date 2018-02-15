@@ -159,15 +159,17 @@ object BiopetPlugin extends AutoPlugin {
    */
   protected def biopetHeaderSettings: Seq[Setting[_]] =
     Seq(
+      // headerMappings for other filetypes
       headerMappings := headerMappings.value +
-        (FileType("html") -> HeaderCommentStyle.xmlStyleBlockComment) +
+        (FileType("html",Some("^<!DOCTYPE html>$\\n".r)) -> HeaderCommentStyle.xmlStyleBlockComment) +
         (FileType("css") -> HeaderCommentStyle.cStyleBlockComment) +
         (FileType.sh -> HeaderCommentStyle.hashLineComment) +
         (FileType("yml") -> HeaderCommentStyle.hashLineComment),
+
       // add files to have header created
       unmanagedSources in (Compile, headerCreate) ++= {
-        (unmanagedResources in Compile).value ++
-          (sources in (Sbt, scalafmt)).value
+        (unmanagedResources in Compile).value ++ //Add resources
+           (sources in (Sbt, scalafmt)).value //Add sbt files
       },
       unmanagedResources in (Test, headerCreate) ++= (unmanagedResources in Test).value,
       // Run headerCreate and Headercheck on all configurations
