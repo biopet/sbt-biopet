@@ -224,7 +224,7 @@ object BiopetPlugin extends AutoPlugin {
         } else s"${version.value}"
       }
     },
-    laikaRawContent in Laika := true, //Laika use raw HTML content in markdown.
+    laikaRawContent in LaikaSite := true, //Laika use raw HTML content in markdown.
     includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
     biopetGenerateDocs := biopetGenerateDocsFunction().value,
     biopetGenerateReadme := biopetGenerateReadmeFunction().value,
