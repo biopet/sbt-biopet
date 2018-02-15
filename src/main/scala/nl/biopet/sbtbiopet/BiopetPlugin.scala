@@ -161,13 +161,9 @@ object BiopetPlugin extends AutoPlugin {
         (FileType("html", Some("^<!DOCTYPE html>$\\n".r)) -> HeaderCommentStyle.xmlStyleBlockComment) +
         (FileType("css") -> HeaderCommentStyle.cStyleBlockComment) +
         (FileType.sh -> HeaderCommentStyle.hashLineComment) +
-        (FileType("yml") -> HeaderCommentStyle.hashLineComment) +
-        (FileType("sbt") -> HeaderCommentStyle.cStyleBlockComment),
-      // add files to have header created
-      unmanagedSources in (Compile, headerCreate) ++= {
-        (unmanagedResources in Compile).value ++ //Add resources
-          (sources in (Sbt, scalafmt)).value //Add sbt files
-      },
+        (FileType("yml") -> HeaderCommentStyle.hashLineComment),
+      //Add resources
+      unmanagedSources in (Compile, headerCreate) ++= (unmanagedResources in Compile).value,
       // add test resources
       unmanagedResources in (Test, headerCreate) ++= (unmanagedResources in Test).value,
       // Make sure headerCheck checks the same things as headerCreate
