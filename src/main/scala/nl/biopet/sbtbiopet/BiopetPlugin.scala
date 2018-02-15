@@ -23,9 +23,12 @@ package nl.biopet.sbtbiopet
 
 import java.io.{File, PrintWriter}
 
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
+  scalafmt,
+  scalafmtOnCompile
+}
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
-import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{scalafmtOnCompile,scalafmt}
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
