@@ -99,7 +99,9 @@ object BiopetPlugin extends AutoPlugin {
       ScoverageSbtPlugin.buildSettings ++
       Seq(
         commands += Command.command("biopetTest") { state =>
-          "scalafmt" ::
+          "scalafmt::test" ::
+            "test:scalafmt::test" ::
+            "sbt:scalafmt::test" ::
             "headerCreate" ::
             "coverage" ::
             "test" ::
@@ -215,7 +217,8 @@ object BiopetPlugin extends AutoPlugin {
   )
 
   protected def biopetScalafmtSettings: Seq[Setting[_]] = Seq(
-    scalafmtOnCompile := true,
+    scalafmtOnCompile := true, // make sure scalafmt is run regularly during development
+    // make sure scalafmt command reformats everything
     scalafmt := (scalafmt in Compile)
       .dependsOn(scalafmt in Test)
       .dependsOn(scalafmt in Sbt)
