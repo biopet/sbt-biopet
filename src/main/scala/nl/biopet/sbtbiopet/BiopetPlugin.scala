@@ -46,10 +46,16 @@ import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
-import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
+  HeaderCommentStyle,
+  headerCheck,
+  headerCreate,
+  headerMappings
+}
+import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
-import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
+import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
@@ -148,7 +154,29 @@ object BiopetPlugin extends AutoPlugin {
   /*
    * Contains al settings related to the license header
    */
-  protected def biopetHeaderSettings: Seq[Setting[_]] = Nil
+  protected def biopetHeaderSettings: Seq[Setting[_]] =
+    Seq(
+      // headerMappings for other filetypes
+      headerMappings := headerMappings.value +
+        (FileType("html", Some("^<!DOCTYPE html>$\\n".r)) -> HeaderCommentStyle.xmlStyleBlockComment) +
+        (FileType("css") -> HeaderCommentStyle.cStyleBlockComment) +
+        (FileType.sh -> HeaderCommentStyle.hashLineComment) +
+        (FileType("yml") -> HeaderCommentStyle.hashLineComment),
+      //Add resources
+      unmanagedSources in (Compile, headerCreate) ++= (unmanagedResources in Compile).value,
+      // add test resources
+      unmanagedResources in (Test, headerCreate) ++= (unmanagedResources in Test).value,
+      // Make sure headerCheck checks the same things as headerCreate
+      unmanagedResources in (Compile, headerCheck) := (unmanagedResources in (Compile, headerCreate)).value,
+      unmanagedResources in (Test, headerCheck) := (unmanagedResources in (Test, headerCreate)).value,
+      // Run headerCreate and Headercheck on all configurations
+      headerCreate := (headerCreate in Compile)
+        .dependsOn(headerCreate in Test)
+        .value,
+      headerCheck := (headerCheck in Compile)
+        .dependsOn(headerCheck in Test)
+        .value
+    )
   /*
    * A sequence of settings containing information such as homepage, licences and git related information.
    */
