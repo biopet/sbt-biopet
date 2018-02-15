@@ -23,6 +23,7 @@ package nl.biopet.sbtbiopet
 
 import java.io.{File, PrintWriter}
 
+import scala.util.matching.Regex
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
   scalafmtOnCompile
@@ -46,8 +47,15 @@ import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
-import de.heikoseeberger.sbtheader.HeaderPlugin
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{headerCreate,headerCheck}
+import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
+  headerCheck,
+  headerCreate,
+  headerMappings,
+  headerSettings,
+  HeaderFileType,
+  HeaderCommentStyle
+}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
@@ -149,10 +157,27 @@ object BiopetPlugin extends AutoPlugin {
   /*
    * Contains al settings related to the license header
    */
-  protected def biopetHeaderSettings: Seq[Setting[_]] = Seq(
-    headerCreate := (headerCreate in Compile).dependsOn(headerCreate in Test).value,
-    headerCheck := (headerCheck in Compile).dependsOn(headerCheck in Test).value
-  )
+  protected def biopetHeaderSettings: Seq[Setting[_]] =
+    Seq(
+      headerMappings := headerMappings.value +
+        (FileType("html") -> HeaderCommentStyle.xmlStyleBlockComment) +
+        (FileType("css") -> HeaderCommentStyle.cStyleBlockComment) +
+        (FileType.sh -> HeaderCommentStyle.hashLineComment) +
+        (FileType("yml") -> HeaderCommentStyle.hashLineComment),
+      // add files to have header created
+      unmanagedSources in (Compile, headerCreate) ++= {
+        (unmanagedResources in Compile).value ++
+          (sources in (Sbt, scalafmt)).value
+      },
+      unmanagedResources in (Test, headerCreate) ++= (unmanagedResources in Test).value,
+      // Run headerCreate and Headercheck on all configurations
+      headerCreate := (headerCreate in Compile)
+        .dependsOn(headerCreate in Test)
+        .value,
+      headerCheck := (headerCheck in Compile)
+        .dependsOn(headerCheck in Test)
+        .value
+    )
   /*
    * A sequence of settings containing information such as homepage, licences and git related information.
    */
