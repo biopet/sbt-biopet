@@ -42,6 +42,7 @@ import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{headerCreate,headerCheck}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
@@ -140,7 +141,10 @@ object BiopetPlugin extends AutoPlugin {
   /*
    * Contains al settings related to the license header
    */
-  protected def biopetHeaderSettings: Seq[Setting[_]] = Nil
+  protected def biopetHeaderSettings: Seq[Setting[_]] = Seq(
+    headerCreate := (headerCreate in Compile).dependsOn(headerCreate in Test).value,
+    headerCheck := (headerCheck in Compile).dependsOn(headerCheck in Test).value
+  )
   /*
    * A sequence of settings containing information such as homepage, licences and git related information.
    */
