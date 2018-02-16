@@ -16,9 +16,13 @@ Plugins that are imported are:
 - sbt-coveralls
 - sbt-coverage
 - sbt-scalafmt
+- sbt-header
+- sbt-update
 
 Common settings are defined for:
 - release
 - Publication and generation of documentation
 - Assembly
 - Publication of JAR
+- Formatting (scalafmt)
+- License headers
