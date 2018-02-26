@@ -202,7 +202,7 @@ object BiopetPlugin extends AutoPlugin {
       useGpg := true,
       ghreleaseRepoName := biopetUrlName.value,
       ghreleaseAssets := {
-        val assemblyPath = assemblyOutputPath.value
+        val assemblyPath = (assemblyOutputPath in assembly).value
         if (biopetIsTool.value) Seq(assemblyPath) else Seq()
       },
       ghreleaseRepoOrg := githubOrganization.value,
@@ -327,8 +327,10 @@ object BiopetPlugin extends AutoPlugin {
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
-      releaseStepCommand("assembly"),
+      runTest,
       setReleaseVersion,
+      releaseStepCommand("set test in assembly := {}"),
+      releaseStepCommand("assembly"),
       commitReleaseVersion,
       tagRelease,
       releaseStepCommand("publishSigned"),
