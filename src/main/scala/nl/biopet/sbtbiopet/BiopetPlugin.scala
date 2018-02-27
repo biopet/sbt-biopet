@@ -193,37 +193,35 @@ object BiopetPlugin extends AutoPlugin {
   /*
    * A sequence of settings specific to release
    */
-  protected def biopetReleaseSettings: Seq[Setting[_]] = {
-    Seq(
-      resolvers += Resolver.sonatypeRepo("snapshots"),
-      resolvers += Resolver.sonatypeRepo("releases"),
-      publishTo := biopetPublishTo.value,
-      publishMavenStyle := true,
-      useGpg := true,
-      ghreleaseRepoName := biopetUrlName.value,
-      ghreleaseAssets := {
-        val assemblyPath = (assemblyOutputPath in assembly).value
-        if (biopetIsTool.value) Seq(assemblyPath) else Seq()
-      },
-      ghreleaseRepoOrg := githubOrganization.value,
-      //ghreleaseTitle same as upstream default. Specified here to be stable between releases.
-      ghreleaseTitle := { tagName =>
-        s"${name.value} $tagName"
-      },
-      // ghreleaseNotes generic message. (Empty message leads to prompt).
-      ghreleaseNotes := { tagName =>
-        s"Release ${tagName.stripPrefix("v")}"
-      },
-      // ghreleaseGithubToken copied from default for stability.
-      ghreleaseGithubToken := {
-        GithubRelease.defs.githubTokenFromEnv(
-          GithubRelease.defs.defaultTokenEnvVar) orElse
-          GithubRelease.defs.githubTokenFromFile(
-            GithubRelease.defs.defaultTokenFile)
-      },
-      releaseProcess := biopetReleaseProcess
-    )
-  }
+  protected def biopetReleaseSettings: Seq[Setting[_]] = Seq(
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    resolvers += Resolver.sonatypeRepo("releases"),
+    publishTo := biopetPublishTo.value,
+    publishMavenStyle := true,
+    useGpg := true,
+    ghreleaseRepoName := biopetUrlName.value,
+    ghreleaseAssets := {
+      val assemblyPath = (assemblyOutputPath in assembly).value
+      if (biopetIsTool.value) Seq(assemblyPath) else Seq()
+    },
+    ghreleaseRepoOrg := githubOrganization.value,
+    //ghreleaseTitle same as upstream default. Specified here to be stable between releases.
+    ghreleaseTitle := { tagName =>
+      s"${name.value} $tagName"
+    },
+    // ghreleaseNotes generic message. (Empty message leads to prompt).
+    ghreleaseNotes := { tagName =>
+      s"Release ${tagName.stripPrefix("v")}"
+    },
+    // ghreleaseGithubToken copied from default for stability.
+    ghreleaseGithubToken := {
+      GithubRelease.defs.githubTokenFromEnv(
+        GithubRelease.defs.defaultTokenEnvVar) orElse
+        GithubRelease.defs.githubTokenFromFile(
+          GithubRelease.defs.defaultTokenFile)
+    },
+    releaseProcess := biopetReleaseProcess
+  )
 
   /*
    * A sequence of settings related to documentation.
