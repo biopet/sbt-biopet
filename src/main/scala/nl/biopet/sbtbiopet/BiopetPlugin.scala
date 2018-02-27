@@ -59,12 +59,7 @@ import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
-import sbtassembly.AssemblyPlugin.autoImport.{
-  Assembly,
-  PathList,
-  assembly,
-  assemblyMergeStrategy
-}
+import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport.{
@@ -205,6 +200,10 @@ object BiopetPlugin extends AutoPlugin {
     publishMavenStyle := true,
     useGpg := true,
     ghreleaseRepoName := biopetUrlName.value,
+    ghreleaseAssets := {
+      val assemblyPath = (assemblyOutputPath in assembly).value
+      if (biopetIsTool.value) Seq(assemblyPath) else Seq()
+    },
     ghreleaseRepoOrg := githubOrganization.value,
     //ghreleaseTitle same as upstream default. Specified here to be stable between releases.
     ghreleaseTitle := { tagName =>
@@ -328,6 +327,8 @@ object BiopetPlugin extends AutoPlugin {
       runClean,
       runTest,
       setReleaseVersion,
+      releaseStepCommand("set test in assembly := {}"),
+      releaseStepCommand("assembly"),
       commitReleaseVersion,
       tagRelease,
       releaseStepCommand("publishSigned"),
