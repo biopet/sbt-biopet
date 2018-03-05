@@ -92,7 +92,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.jsuereth" % "sbt-pgp" % "1.1.0",
+    "com.jsuereth" % "sbt-pgp" % "1.1.1",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
