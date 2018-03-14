@@ -354,10 +354,16 @@ object BiopetPlugin extends AutoPlugin {
     Def.setting {
       new FileFilter {
         def accept(f: File): Boolean = {
+          // Take the relative path, so only values within the
+          // ghpagesRepository are taken into account.
+          val empty: File = new File("")
+          val relativePath =
+            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString()
           if (isSnapshot.value) {
-            f.getPath.contains("develop")
+            relativePath.contains("develop")
           } else {
-            f.getPath.contains(s"${version.value}") ||
+            relativePath.contains(s"${version.value}") ||
+            // Also index.html needs to deleted to point to a new version.
             f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
           }
         }
