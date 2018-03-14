@@ -357,7 +357,8 @@ object BiopetPlugin extends AutoPlugin {
           // Take the relative path, so only values within the
           // ghpagesRepository are taken into account.
           val empty: File = new File("")
-          val relativePath = f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString()
+          val relativePath =
+            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString()
           if (isSnapshot.value) {
             relativePath.contains("develop")
           } else {
