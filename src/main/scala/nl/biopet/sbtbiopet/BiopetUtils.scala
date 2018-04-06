@@ -12,20 +12,32 @@ object BiopetUtils {
     * @return The chapter including header and subheaders as a string.
     */
   def markdownExtractChapter(markdown: String, chapter: String): String = {
-    val text = markdown.split(lineSeparator).toList
-    val chapterRegex = s"^(#+)([\\t ]*)($chapter)\\n".r("hashtags","whitespace","heading")
+    // Regex is anchored with ^pattern$ by default.
+    // Matches any number of #'s, a whitespace (tab or space) that does not have to exist and the chapter.
+    val chapterRegex = s"(#+)([\\t ]*)($chapter)".r("hashtags","whitespace","heading")
     val headingDepth = chapterRegex.findFirstMatchIn(markdown) match {
       case Some(r) => r.group("hashtags").length
       case None => throw new Exception("Chapter not found")
     }
-    val regex = s"(^#{1,$headingDepth})([\\t ]*)(.*)\\n".r
+    println(headingDepth)
+
+    // General matcher that returns true if the line is
+    // a. a markdown chapter (starting with #)
+    // b. Starting with a maximum of headingDepth hashtags.
+    // If the maximum dept is exceeded (another # was found) then retuns false.
+    // This way we can split the markdown at a desired depth.
     def matcher(string: String): Boolean = {
+      val regex = s"^(#{1,$headingDepth})[^#]([\\t ]*)(.*)$$".r
       regex.findFirstMatchIn(string) match {
         case Some(r) => true
         case _ => false
       }
     }
+
+    val text = markdown.split(lineSeparator).toList
+    println(text)
     val chapters = splitStringList(text, matcher)
+    println(chapters)
     val correctChapter = chapters.find(lines => {
       chapterRegex.findFirstMatchIn(lines.mkString) match {
         case Some(r) => true
@@ -41,7 +53,10 @@ object BiopetUtils {
   def splitStringList(stringList:List[String], splitter: String => Boolean): List[List[String]] = {
        val buffers =stringList.foldLeft(ListBuffer[ListBuffer[String]]()) { case (result, line) =>
       if (splitter(line)) result += ListBuffer(line)
-      else result.lastOption.getOrElse(ListBuffer()) += line
+      else result.lastOption match {
+        case Some(lb) => result.last += line
+        case None => result += ListBuffer(line)
+      }
         result
     }
     buffers.map(buffer => buffer.toList).toList
