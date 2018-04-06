@@ -16,5 +16,9 @@ class BiopetUtilsTest extends TestNGSuite with Matchers {
     val n = lineSeparator
     markdownExtractChapter(markdown,".*") shouldBe s"Onedotone${n}1.1${n}${n}"
   }
-
+  @Test
+  def testSplitStringList(): Unit = {
+    val a = List("a","ab","bc","ac")
+    splitStringList(a, x => x.startsWith("a")) shouldBe List(List("a"),List("ab","bc"), List("ac"))
+  }
 }

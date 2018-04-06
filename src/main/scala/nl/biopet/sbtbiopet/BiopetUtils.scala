@@ -39,10 +39,9 @@ object BiopetUtils {
   }
 
   def splitStringList(stringList:List[String], splitter: String => Boolean): List[List[String]] = {
-
-    val buffers =stringList.foldLeft(ListBuffer(ListBuffer[String]())) { case (result, line) =>
+       val buffers =stringList.foldLeft(ListBuffer[ListBuffer[String]]()) { case (result, line) =>
       if (splitter(line)) result += ListBuffer(line)
-      else result.last += line
+      else result.lastOption.getOrElse(ListBuffer()) += line
         result
     }
     buffers.map(buffer => buffer.toList).toList
