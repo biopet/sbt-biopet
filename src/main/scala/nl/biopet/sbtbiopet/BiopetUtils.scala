@@ -1,12 +1,18 @@
 package nl.biopet.sbtbiopet
 
-import java.io.File
+
 
 import scala.collection.mutable.ListBuffer
-import scala.io.Source
-object BiopetUtlis {
-  def markdownExtractChapter(markdownFile: File, chapter: String): String = {
-    val text = Source.fromFile(markdownFile).getLines().toList
+import util.Properties.lineSeparator
+object BiopetUtils {
+  /**
+    * Extracts a chapter from a markdown string
+    * @param markdown the input string
+    * @param chapter the chapter heading. (without #)
+    * @return The chapter including header and subheaders as a string.
+    */
+  def markdownExtractChapter(markdown: String, chapter: String): String = {
+    val text = markdown.split(lineSeparator).toList
     val chapterRegex = "(^#+)([\\t ]*)(.*)$".r("hashtags","whitespace","heading")
     val allChapters = chapterRegex.findAllIn(text.mkString("\n")).matchData.toList
     val chapterLine = allChapters.find(r => r.group("heading")== chapter)
@@ -30,7 +36,7 @@ object BiopetUtlis {
       case _ => false
     })
     correctChapter match {
-      case Some(x) => x.mkString("\n")
+      case Some(x) => x.mkString(lineSeparator)
       case _ => throw new Exception()
     }
   }
