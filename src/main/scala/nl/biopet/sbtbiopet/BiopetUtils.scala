@@ -13,27 +13,24 @@ object BiopetUtils {
     */
   def markdownExtractChapter(markdown: String, chapter: String): String = {
     val text = markdown.split(lineSeparator).toList
-    val chapterRegex = "(^#+)([\\t ]*)(.*)$".r("hashtags","whitespace","heading")
-    val allChapters = chapterRegex.findAllIn(text.mkString("\n")).matchData.toList
-    val chapterLine = allChapters.find(r => r.group("heading")== chapter)
-    val headingDepth = chapterLine match {
+    val chapterRegex = s"^(#+)([\\t ]*)($chapter)\\n".r("hashtags","whitespace","heading")
+    val headingDepth = chapterRegex.findFirstMatchIn(markdown) match {
       case Some(r) => r.group("hashtags").length
-      case _ => throw new Exception("Chapter not found")
+      case None => throw new Exception("Chapter not found")
     }
-    val regex = s"(^#{1,$headingDepth})([\\t ]*)(.*)$$".r
+    val regex = s"(^#{1,$headingDepth})([\\t ]*)(.*)\\n".r
     def matcher(string: String): Boolean = {
-      string match {
-        case regex => true
+      regex.findFirstMatchIn(string) match {
+        case Some(r) => true
         case _ => false
       }
     }
     val chapters = splitStringList(text, matcher)
-    val correctChapter = chapters.find(lines => lines.headOption match {
-      case Some(line) => chapterRegex.findFirstMatchIn(line) match {
-        case Some(matcherObject) => matcherObject.group("heading") == chapter
+    val correctChapter = chapters.find(lines => {
+      chapterRegex.findFirstMatchIn(lines.mkString) match {
+        case Some(r) => true
         case _ => false
       }
-      case _ => false
     })
     correctChapter match {
       case Some(x) => x.mkString(lineSeparator)

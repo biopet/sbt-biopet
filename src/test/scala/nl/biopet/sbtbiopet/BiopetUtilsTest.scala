@@ -12,9 +12,9 @@ class BiopetUtilsTest extends TestNGSuite with Matchers {
 
   @Test
   def testMarkdownExtractChapter(): Unit = {
-    val markdown: String = Source.fromResource("nl/biopet/sbtbiopet/test.md").toString()
+    val markdown: String = Source.fromResource("nl/biopet/sbtbiopet/test.md").getLines().mkString("\n")
     val n = lineSeparator
-    markdownExtractChapter(markdown,"1.1") shouldBe s"1.1${n}1.1${n}${n}"
+    markdownExtractChapter(markdown,".*") shouldBe s"Onedotone${n}1.1${n}${n}"
   }
 
 }
