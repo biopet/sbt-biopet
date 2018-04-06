@@ -140,5 +140,10 @@ libraryDependencies ++= Seq(
     "ohnosequences" % "sbt-github-release" % "0.7.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.github.biopet" % "sbt-bioconda" % "0.1-SNAPSHOT" changing(),
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
   )
 )
