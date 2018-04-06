@@ -22,7 +22,8 @@
 package nl.biopet.sbtbiopet
 
 import java.io.{File, PrintWriter}
-
+import nl.biopet.bioconda.BiocondaPlugin
+import nl.biopet.bioconda.BiocondaPlugin.autoImport.{biocondaGitUrl,biocondaSummary,biocondaRelease,biocondaCommand,biocondaTestCommands, Bioconda}
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
   scalafmtOnCompile
@@ -130,12 +131,14 @@ object BiopetPlugin extends AutoPlugin {
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
+    BiocondaPlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
       biopetDocumentationSettings ++
       biopetHeaderSettings ++
-      biopetScalafmtSettings
+      biopetScalafmtSettings ++
+    biopetBiocondaSettings
   }
 
   /*
@@ -268,6 +271,17 @@ object BiopetPlugin extends AutoPlugin {
       .dependsOn(scalafmt in Sbt)
       .value
   )
+
+  protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
+    biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
+    name in Bioconda := s"biopet_${normalizedName.value}",
+  biocondaCommand := s"biopet-${normalizedName.value}",
+    biocondaTestCommands := {
+      val command = biocondaCommand.value
+      Seq(s"$command --version", s"$command --help")
+    }
+
+  )
   /*
    * The merge strategy that is used in biopet projects
    */
@@ -357,8 +371,8 @@ object BiopetPlugin extends AutoPlugin {
           // Take the relative path, so only values within the
           // ghpagesRepository are taken into account.
           val empty: File = new File("")
-          val relativePath =
-            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString()
+          val relativePath: TagName =
+            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString
           if (isSnapshot.value) {
             relativePath.contains("develop")
           } else {
