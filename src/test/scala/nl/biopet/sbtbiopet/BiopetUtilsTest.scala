@@ -14,7 +14,38 @@ class BiopetUtilsTest extends TestNGSuite with Matchers {
   def testMarkdownExtractChapter(): Unit = {
     val markdown: String = Source.fromResource("nl/biopet/sbtbiopet/test.md").getLines().mkString("\n")
     val n = lineSeparator
-    markdownExtractChapter(markdown,"Onedotone") shouldBe s"Onedotone${n}1.1${n}${n}"
+    markdownExtractChapter(markdown,"Onedotone") shouldBe """## Onedotone
+                                                            |1.1
+                                                            |
+                                                            |### Onedotonedotone
+                                                            |1.1.1
+                                                            |""".stripMargin
+    markdownExtractChapter(markdown,"One") shouldBe
+      """# One
+        |1
+        |
+        |## Onedotone
+        |1.1
+        |
+        |### Onedotonedotone
+        |1.1.1
+        |
+        |## Onedottwo
+        |1.2
+        |
+        |## Onedotthree
+        |1.3
+        |
+        |## Onedotfour
+        |1.4
+        |""".stripMargin
+    markdownExtractChapter(markdown,"Onedotonedotone") shouldBe
+    """### Onedotonedotone
+      |1.1.1
+      |""".stripMargin
+    markdownExtractChapter(markdown,"Onedotonedotone",includeHeader = false) shouldBe
+      """|1.1.1
+         |""".stripMargin
   }
   @Test
   def testSplitStringList(): Unit = {
