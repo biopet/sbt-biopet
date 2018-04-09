@@ -296,15 +296,14 @@ object BiopetPlugin extends AutoPlugin {
           markdownExtractChapter(readme, "About", includeHeader = false)
       } else ""
     },
-    biocondaRelease := Def.taskDyn {
-      Def.task {
+    biocondaRelease :=
+      Def.taskDyn {
         if (biopetIsTool.value) {
-          biocondaRelease.taskValue
-        } else {
-          // Utils shoud not be released
+          Def.task {}.dependsOn(biocondaRelease)
         }
-      }
-    }.value
+        // Utils are not released
+        else Def.task {}
+      }.value
   )
   /*
    * The merge strategy that is used in biopet projects
