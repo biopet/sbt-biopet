@@ -15,7 +15,6 @@ libraryDependencies += "com.github.biopet" %% "tool-test-utils" % "0.1" % Test
 TaskKey[Unit]("checkValues") := {
   val validGitRepo = "git@github.com:biopet/dummytool.git"
   val validHomePage = Some(url("https://github.com/biopet/dummytool"))
-
   assert(git.remoteRepo.value == validGitRepo, s"'${git.remoteRepo.value}' does not equal '$validGitRepo'")
   assert(homepage.value == validHomePage, s"'${homepage.value}' does not equal '$validHomePage'")
   assert(useGpg.value, "useGpg should be true")
@@ -30,4 +29,6 @@ TaskKey[Unit]("checkValues") := {
       else
         Some(Opts.resolver.sonatypeStaging)
     }.value, "publishTo has incorrect value")
+  assert(biocondaSummary.contains("part of BIOPET tool suite", "About text should be part of summary"))
+  assert(biocondaSummary.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit", "Description should be part of summary")
 }

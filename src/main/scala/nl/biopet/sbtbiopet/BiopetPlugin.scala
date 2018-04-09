@@ -291,9 +291,20 @@ object BiopetPlugin extends AutoPlugin {
     },
     biocondaSummary := {
       val readme = Source.fromFile(biopetReadmePath.value).mkString
-      markdownExtractChapter(readme, "Description", includeHeader = false) +
-        markdownExtractChapter(readme, "About", includeHeader = false)
-    }
+      if (biopetIsTool.value) {
+        markdownExtractChapter(readme, "Description", includeHeader = false) +
+          markdownExtractChapter(readme, "About", includeHeader = false)
+      } else ""
+    },
+    biocondaRelease := Def.taskDyn {
+      Def.task {
+        if (biopetIsTool.value) {
+          biocondaRelease.taskValue
+        } else {
+          // Utils shoud not be released
+        }
+      }
+    }.value
   )
   /*
    * The merge strategy that is used in biopet projects
@@ -367,7 +378,8 @@ object BiopetPlugin extends AutoPlugin {
       releaseStepCommand("git merge master"),
       setNextVersion,
       commitNextVersion,
-      pushChanges
+      pushChanges,
+      releaseStepCommand("biocondaRelease")
     )
   }
 
