@@ -289,13 +289,22 @@ object BiopetPlugin extends AutoPlugin {
       val command = biocondaCommand.value
       Seq(s"$command --version", s"$command --help")
     },
-    biocondaSummary := {
-      val readme = Source.fromFile(biopetReadmePath.value).mkString
-      if (biopetIsTool.value) {
-        markdownExtractChapter(readme, "Description", includeHeader = false) +
-          markdownExtractChapter(readme, "About", includeHeader = false)
-      } else ""
-    },
+    biocondaSummary := Def
+      .taskDyn {
+        val readme = Source.fromFile(biopetReadmePath.value).mkString
+        if (biopetIsTool.value) {
+          Def
+            .task {
+              markdownExtractChapter(readme, name.value, includeHeader = false) +
+                markdownExtractChapter(readme,
+                                       "Documentation",
+                                       includeHeader = false) +
+                markdownExtractChapter(readme, "About", includeHeader = false)
+            }
+        } else Def.task { "" }
+      }
+      .dependsOn(biopetGenerateReadme)
+      .value,
     biocondaRelease :=
       Def.taskDyn {
         if (biopetIsTool.value) {
