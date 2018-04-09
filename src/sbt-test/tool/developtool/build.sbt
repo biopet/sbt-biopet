@@ -13,6 +13,7 @@ libraryDependencies += "com.github.biopet" %% "tool-utils" % "0.2"
 libraryDependencies += "com.github.biopet" %% "tool-test-utils" % "0.1" % Test
 
 TaskKey[Unit]("checkValues") := {
+  streams.value.log.info("Start value testing...")
   val validGitRepo = "git@github.com:biopet/dummytool.git"
   val validHomePage = Some(url("https://github.com/biopet/dummytool"))
   assert(git.remoteRepo.value == validGitRepo,
@@ -37,10 +38,14 @@ TaskKey[Unit]("checkValues") := {
     "publishTo has incorrect value"
   )
   assert(
-    biocondaSummary.value.contains("part of BIOPET tool suite",
-                                   "About text should be part of summary"))
-  assert(
-    biocondaSummary.value.contains(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-      "Description should be part of summary"))
+    biocondaSummary.value.contains("part of BIOPET tool suite"),
+    "About text should be part of summary"
+  )
+  assert(biocondaSummary.value.contains(
+           "Lorem ipsum dolor sit amet, consectetur adipiscing elit"),
+         "Description should be part of summary")
+  assert(biocondaSummary.value.contains("For documentation and manuals"),
+         "Documentation link should be part of summary")
+  assert(!biocondaSummary.value.contains("# About"),
+         "Headers should have been removed in summary")
 }
