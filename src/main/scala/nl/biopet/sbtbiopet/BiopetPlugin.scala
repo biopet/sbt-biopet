@@ -23,7 +23,14 @@ package nl.biopet.sbtbiopet
 
 import java.io.{File, PrintWriter}
 import nl.biopet.bioconda.BiocondaPlugin
-import nl.biopet.bioconda.BiocondaPlugin.autoImport.{biocondaGitUrl,biocondaSummary,biocondaRelease,biocondaCommand,biocondaTestCommands, Bioconda}
+import nl.biopet.bioconda.BiocondaPlugin.autoImport.{
+  biocondaGitUrl,
+  biocondaSummary,
+  biocondaRelease,
+  biocondaCommand,
+  biocondaTestCommands,
+  Bioconda
+}
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
   scalafmtOnCompile
@@ -69,6 +76,8 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseStepCommand
 }
 import scoverage.ScoverageSbtPlugin
+import nl.biopet.sbtbiopet.BiopetUtils.markdownExtractChapter
+import scala.io.Source
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
 
@@ -131,14 +140,14 @@ object BiopetPlugin extends AutoPlugin {
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
-    BiocondaPlugin.projectSettings ++
+      BiocondaPlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
       biopetDocumentationSettings ++
       biopetHeaderSettings ++
       biopetScalafmtSettings ++
-    biopetBiocondaSettings
+      biopetBiocondaSettings
   }
 
   /*
@@ -275,12 +284,16 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
     biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
     name in Bioconda := s"biopet_${normalizedName.value}",
-  biocondaCommand := s"biopet-${normalizedName.value}",
+    biocondaCommand := s"biopet-${normalizedName.value}",
     biocondaTestCommands := {
       val command = biocondaCommand.value
       Seq(s"$command --version", s"$command --help")
+    },
+    biocondaSummary := {
+      val readme = Source.fromFile(biopetReadmePath.value).mkString
+      markdownExtractChapter(readme, "Description", includeHeader = false) +
+        markdownExtractChapter(readme, "About", includeHeader = false)
     }
-
   )
   /*
    * The merge strategy that is used in biopet projects
