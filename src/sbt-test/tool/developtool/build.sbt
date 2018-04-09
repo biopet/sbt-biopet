@@ -1,19 +1,19 @@
-lazy val root = (project in file(".")).settings(
-  name := "DummyTool",
-  organizationName := "Dummy Organization",
-  organization := "example.dummy",
-  startYear := Some(2017),
-  biopetUrlName := "dummytool",
-  biopetIsTool := true,
-  mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool"),
-  scalaVersion := "2.11.11"
-)
+lazy val checkValues = taskKey[Unit]("checks the values")
+
+name := "DummyTool"
+organizationName := "Dummy Organization"
+organization := "example.dummy"
+startYear := Some(2017)
+biopetUrlName := "dummytool"
+biopetIsTool := true
+mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool")
+scalaVersion := "2.11.11"
 
 libraryDependencies += "com.github.biopet" %% "tool-utils" % "0.2"
 libraryDependencies += "com.github.biopet" %% "tool-test-utils" % "0.1" % Test
 
-TaskKey[Unit]("checkValues") := {
-  streams.value.log.info("Start value testing...")
+checkValues := {
+  println("Start value testing...")
   val validGitRepo = "git@github.com:biopet/dummytool.git"
   val validHomePage = Some(url("https://github.com/biopet/dummytool"))
   assert(git.remoteRepo.value == validGitRepo,
