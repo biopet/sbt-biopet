@@ -283,7 +283,7 @@ object BiopetPlugin extends AutoPlugin {
 
   protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
     biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
-    name in Bioconda := s"biopet_${normalizedName.value}",
+    name in Bioconda := s"biopet-${normalizedName.value}",
     biocondaCommand := s"biopet-${normalizedName.value}",
     biocondaTestCommands := {
       val command = biocondaCommand.value
