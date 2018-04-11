@@ -282,6 +282,7 @@ object BiopetPlugin extends AutoPlugin {
   )
 
   protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
+    biopetReleaseInBioconda := true,
     biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
     name in Bioconda := s"biopet-${normalizedName.value}",
     biocondaCommand := s"biopet-${normalizedName.value}",
@@ -307,7 +308,7 @@ object BiopetPlugin extends AutoPlugin {
       .value,
     biocondaRelease :=
       Def.taskDyn {
-        if (biopetIsTool.value) {
+        if (biopetIsTool.value && biopetReleaseInBioconda.value) {
           Def.task {}.dependsOn(biocondaRelease)
         }
         // Utils are not released
