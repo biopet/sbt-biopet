@@ -305,8 +305,10 @@ object BiopetPlugin extends AutoPlugin {
                                          includeHeader = false) +
                   markdownExtractChapter(readme, "About", includeHeader = false)
               }
-              // Replace all single newlines with a space for cosmetic reasons.
-                .replaceAll(s"([^\n])(\n)([^\n])", "$1 $3")
+                // Replace all single newlines with a space for cosmetic reasons.
+                // Except the newlines in front of a list character.
+                .replaceAll("([^\n])(\n)([^\n])([^-+*0-9])", "$1 $3$4")
+                .trim
             }
         } else Def.task { "" }
       }
