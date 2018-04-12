@@ -309,7 +309,7 @@ object BiopetPlugin extends AutoPlugin {
     biocondaRelease :=
       Def.taskDyn {
         if (biopetIsTool.value && biopetReleaseInBioconda.value) {
-          Def.task {}.dependsOn(biocondaRelease)
+          BiocondaPlugin.releaseProcedure()
         }
         // Utils are not released
         else Def.task {}
