@@ -26,41 +26,39 @@ biopetUrlName := "testtool"
 biopetIsTool := true
 biopetReleaseInBioconda := false
 checkRepo := Def.task {
-filesExistInDir(biocondaRepository.value,
-      Seq(".github",
-        "recipes",
-        "scripts",
-        "recipes/biopet",
-        "config.yml")
+  filesExistInDir(
+    biocondaRepository.value,
+    Seq(".github", "recipes", "scripts", "recipes/biopet", "config.yml"))
+}.value
+checkRecipes := Def.task {
+  filesExistInDir(biocondaRecipeDir.value,
+                  Seq("0.1/meta.yaml",
+                      "0.1/build.sh",
+                      "0.1/biopet-testtool.py",
+                      "meta.yaml",
+                      "build.sh",
+                      "biopet-testtool.py"))
+}.value
+checkCopy := Def.task {
+  filesExistInDir(
+    biocondaRepository.value,
+    Seq(
+      "recipes/biopet-testtool/0.1/meta.yaml",
+      "recipes/biopet-testtool/0.1/build.sh",
+      "recipes/biopet-testtool/0.1/biopet-testtool.py",
+      "recipes/biopet-testtool/meta.yaml",
+      "recipes/biopet-testtool/build.sh",
+      "recipes/biopet-testtool/biopet-testtool.py"
     )
-  }.value
-  checkRecipes := Def.task {
-    filesExistInDir(biocondaRecipeDir.value,
-      Seq("0.1/meta.yaml",
-        "0.1/build.sh",
-        "0.1/testtool.py",
-        "meta.yaml",
-        "build.sh",
-        "testtool.py")
-    )
-  }.value
-  checkCopy := Def.task {
-    filesExistInDir(biocondaRepository.value,
-      Seq("recipes/biopet-testtool/0.1/meta.yaml",
-        "recipes/biopet-testtool/0.1/build.sh",
-        "recipes/biopet-testtool/0.1/testtool.py",
-        "recipes/biopet-testtool/meta.yaml",
-        "recipes/biopet-testtool/build.sh",
-        "recipes/biopet-testtool/testtool.py")
-    )
-  }.value
-  deleteTmp := Def.task{FileUtils.deleteDirectory(biocondaRepository.value)}.value
-    resolvers += Resolver.sonatypeRepo("snapshots")
+  )
+}.value
+deleteTmp := Def.task { FileUtils.deleteDirectory(biocondaRepository.value) }.value
+resolvers += Resolver.sonatypeRepo("snapshots")
 
 def fileExistsInDir(dir: File, file: String): Unit = {
-  assert(new File(dir,file).exists(), s"$file should exist in $dir")
+  assert(new File(dir, file).exists(), s"$file should exist in $dir")
 }
-def filesExistInDir(dir:File, files: Seq[String]): Unit = {
+def filesExistInDir(dir: File, files: Seq[String]): Unit = {
   files.foreach(file => fileExistsInDir(dir, file))
 }
 def getRepo: Def.Initialize[Task[GHRepository]] = Def.task {
@@ -71,10 +69,11 @@ def getRepo: Def.Initialize[Task[GHRepository]] = Def.task {
 // Home directory is used because using /tmp gives errors while testing
 def biocondaTempDir: Def.Initialize[File] = {
   Def.setting {
-  val homeTest = new File(sys.env("HOME"))
-  val dir = java.io.File.createTempFile("bioconda",".d",homeTest)
-  dir.delete()
-  dir.mkdirs()
-  dir.deleteOnExit()
-  dir
-}}
+    val homeTest = new File(sys.env("HOME"))
+    val dir = java.io.File.createTempFile("bioconda", ".d", homeTest)
+    dir.delete()
+    dir.mkdirs()
+    dir.deleteOnExit()
+    dir
+  }
+}
