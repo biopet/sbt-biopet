@@ -2,7 +2,7 @@ package nl.biopet.tools.dummytool
 
 import nl.biopet.utils.tool.ToolCommand
 
-object DummyTool extends ToolCommand[Args] {
+object testtool extends ToolCommand[Args] {
   def emptyArgs = Args()
   def argsParser = new ArgsParser(this)
 

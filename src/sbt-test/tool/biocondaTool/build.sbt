@@ -24,6 +24,7 @@ ghreleaseGetRepo := getRepo.value
 biocondaRepository := biocondaTempDir.value
 biopetUrlName := "testtool"
 biopetIsTool := true
+biopetReleaseInBioconda := false
 checkRepo := Def.task {
 filesExistInDir(biocondaRepository.value,
       Seq(".github",
