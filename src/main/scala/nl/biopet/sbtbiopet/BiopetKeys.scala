@@ -33,7 +33,8 @@ trait BiopetKeys {
   lazy val biopetGenerateDocs = taskKey[Unit]("Generate documentation files")
   lazy val biopetGenerateReadme = taskKey[Unit]("Generate readme")
   lazy val biopetIsTool = settingKey[Boolean]("Whether the project is a tool")
-  lazy val biopetReleaseInBioconda = settingKey[Boolean]("Whether the tool should be released in bioconda")
+  lazy val biopetReleaseInBioconda =
+    settingKey[Boolean]("Whether the tool should be released in bioconda")
   lazy val githubOrganization =
     settingKey[String]("The organization name on github")
 }

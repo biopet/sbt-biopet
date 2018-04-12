@@ -296,11 +296,17 @@ object BiopetPlugin extends AutoPlugin {
         if (biopetIsTool.value) {
           Def
             .task {
-              markdownExtractChapter(readme, name.value, includeHeader = false) +
+              {
                 markdownExtractChapter(readme,
-                                       "Documentation",
+                                       name.value,
                                        includeHeader = false) +
-                markdownExtractChapter(readme, "About", includeHeader = false)
+                  markdownExtractChapter(readme,
+                                         "Documentation",
+                                         includeHeader = false) +
+                  markdownExtractChapter(readme, "About", includeHeader = false)
+              }
+              // Replace all single newlines with a space for cosmetic reasons.
+                .replaceAll(s"([^\n])(\n)([^\n])", "$1 $3")
             }
         } else Def.task { "" }
       }
