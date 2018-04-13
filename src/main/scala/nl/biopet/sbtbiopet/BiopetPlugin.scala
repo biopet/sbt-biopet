@@ -302,12 +302,12 @@ object BiopetPlugin extends AutoPlugin {
                                        includeHeader = false) +
                   markdownExtractChapter(readme,
                                          "Documentation",
-                                         includeHeader = false) +
-                  markdownExtractChapter(readme, "About", includeHeader = false)
+                                         includeHeader = false)
               }
                 // Replace all single newlines with a space for cosmetic reasons.
                 // Except the newlines in front of a list character.
-                .replaceAll("([^\n])(\n)([^\n])([^-+*0-9])", "$1 $3$4")
+                .replaceAll("\n", " ")
+                // Remove whitespace from beginning and end of string.
                 .trim
             }
         } else Def.task { "" }
