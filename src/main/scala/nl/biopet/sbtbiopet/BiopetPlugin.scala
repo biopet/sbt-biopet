@@ -304,9 +304,10 @@ object BiopetPlugin extends AutoPlugin {
                                          "Documentation",
                                          includeHeader = false)
               }
-                // Replace all single newlines with a space for cosmetic reasons.
-                // Except the newlines in front of a list character.
+              // Replace all newlines with space for cosmetic reasons
                 .replaceAll("\n", " ")
+                // Remove all extra spaces.
+                .replaceAll("( )( *)", "$1")
                 // Remove whitespace from beginning and end of string.
                 .trim
             }
@@ -397,7 +398,6 @@ object BiopetPlugin extends AutoPlugin {
       setNextVersion,
       commitNextVersion,
       pushChanges
-
     )
   }
 
