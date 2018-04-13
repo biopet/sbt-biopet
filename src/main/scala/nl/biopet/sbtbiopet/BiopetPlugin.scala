@@ -391,12 +391,13 @@ object BiopetPlugin extends AutoPlugin {
       releaseStepCommand("ghpagesPushSite"),
       pushChanges,
       releaseStepCommand("githubRelease"),
+      releaseStepCommand("biocondaRelease"),
       releaseStepCommand("git checkout develop"),
       releaseStepCommand("git merge master"),
       setNextVersion,
       commitNextVersion,
-      pushChanges,
-      releaseStepCommand("biocondaRelease")
+      pushChanges
+
     )
   }
 
