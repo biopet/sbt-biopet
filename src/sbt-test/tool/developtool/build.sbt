@@ -37,10 +37,6 @@ checkValues := {
       }.value,
     "publishTo has incorrect value"
   )
-  assert(
-    biocondaSummary.value.contains("part of BIOPET tool suite"),
-    "About text should be part of summary"
-  )
   assert(biocondaSummary.value.contains(
            "Lorem ipsum dolor sit amet, consectetur adipiscing elit"),
          "Description should be part of summary")
