@@ -4,7 +4,7 @@
 > biocondaUpdatedRepository
 > checkRepo
 > biocondaUpdatedBranch
-> biocondaCreateRecipes
+> biocondaCreateRecipe
 > checkRecipes
 $ exists target/recipes
 > biocondaAddRecipes
