@@ -280,9 +280,7 @@ object BiopetPlugin extends AutoPlugin {
                     includeHeader = false)
               }
                 // Replace all newlines with space for cosmetic reasons
-                .replaceAll("\n", " ")
-                // Remove all extra spaces.
-                .replaceAll("( )( *)", "$1")
+                .replaceAll("([^\\n])(\\n)([^\\n]|[^-+*0-9])", "$1 $3")
                 // Remove whitespace from beginning and end of string.
                 .trim)
               }
