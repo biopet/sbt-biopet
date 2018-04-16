@@ -23,19 +23,35 @@ package nl.biopet.sbtbiopet
 
 import java.io.{File, PrintWriter}
 
-import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{scalafmt, scalafmtOnCompile}
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
+  scalafmt,
+  scalafmtOnCompile
+}
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesPushSite, ghpagesRepository}
-import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
+  ghpagesCleanSite,
+  ghpagesPushSite,
+  ghpagesRepository
+}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{
+  makeSite,
+  siteDirectory,
+  siteSubdirName
+}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{HeaderCommentStyle, headerCheck, headerCreate, headerMappings}
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
+  HeaderCommentStyle,
+  headerCheck,
+  headerCreate,
+  headerMappings
+}
 import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import nl.biopet.bioconda.BiocondaPlugin
@@ -49,7 +65,11 @@ import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommand}
+import sbtrelease.ReleasePlugin.autoImport.{
+  ReleaseStep,
+  releaseProcess,
+  releaseStepCommand
+}
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -273,34 +293,40 @@ object BiopetPlugin extends AutoPlugin {
             .task {
               Some({
                 markdownExtractChapter(readme,
-                  name.value,
-                  includeHeader = false) +
+                                       name.value,
+                                       includeHeader = false).trim + "\n\n" +
                   markdownExtractChapter(readme,
-                    "Documentation",
-                    includeHeader = false)
+                                         "Documentation",
+                                         includeHeader = false).trim
               }
-                // Replace all newlines with space for cosmetic reasons
-                .replaceAll("([^\\n])(\\n)([^\\n]|[^-+*0-9])", "$1 $3")
+              // Replace all newlines with space for cosmetic reasons
+                .replaceAll("([^\\n])(\\n)([^\\n\\-+*0-9])", "$1 $3")
                 // Remove whitespace from beginning and end of string.
                 .trim)
-              }
+            }
         } else Def.task { Some("") }
       }
       .dependsOn(biopetGenerateReadme)
       .value,
-    biocondaSummary := Def.taskDyn {
-      val readme = Source.fromFile(biopetReadmePath.value).mkString
-      if (biopetIsTool.value) {Def.task {
-        val description = markdownExtractChapter(readme,name.value,includeHeader = false)
-        // Assuming the first sentence ends with .
-        description.split(".").headOption match {
-          case Some(s) => s +"."
-          case _ => s"This summary for ${(name in Bioconda).value} was automatically generated."
-        }
+    biocondaSummary := Def
+      .taskDyn {
+        val readme = Source.fromFile(biopetReadmePath.value).mkString
+        if (biopetIsTool.value) {
+          Def.task {
+            val description =
+              markdownExtractChapter(readme, name.value, includeHeader = false)
+            // Assuming the first sentence ends with .
+            description.split("\\.").headOption match {
+              case Some(s) => { s + "." }.replace("\n", " ").trim
+              case _ =>
+                s"This summary for ${(name in Bioconda).value} was automatically generated."
+            }
 
-      }}
-      else Def.task {""}
-    }.dependsOn(biopetGenerateReadme).value,
+          }
+        } else Def.task { "" }
+      }
+      .dependsOn(biopetGenerateReadme)
+      .value,
     biocondaRelease :=
       Def.taskDyn {
         if (biopetIsTool.value && biopetReleaseInBioconda.value) {
