@@ -37,11 +37,14 @@ checkValues := {
       }.value,
     "publishTo has incorrect value"
   )
-  assert(biocondaSummary.value.contains(
-           "Lorem ipsum dolor sit amet, consectetur adipiscing elit"),
-         "Description should be part of summary")
-  assert(biocondaSummary.value.contains("For documentation and manuals"),
-         "Documentation link should be part of summary")
-  assert(!biocondaSummary.value.contains("# About"),
-         "Headers should have been removed in summary")
+  assert(
+    biocondaSummary.value == "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "Summary should be first sentence of description.")
+  assert(biocondaDescription.value.getOrElse("").contains(
+           "Aliquam bibendum tellus sed lectus tristique egestas."),
+         "Full tool description should be in biocondaDescription.")
+  assert(biocondaDescription.value.getOrElse("").contains("For documentation and manuals"),
+         "Documentation link should be part of description")
+  assert(!biocondaDescription.value.getOrElse("").contains("# Documentation"),
+         "Headers should have been removed in description")
 }
