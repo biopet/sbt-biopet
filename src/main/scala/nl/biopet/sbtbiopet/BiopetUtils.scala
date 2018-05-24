@@ -36,10 +36,10 @@ object BiopetUtils {
                       splitter: String => Boolean): List[List[String]] = {
     stringList
       .foldLeft(ListBuffer[ListBuffer[String]]()) {
-        case (result, line) if (splitter(line)) || result.lastOption.isEmpty =>
+        case (result, line) if splitter(line) || result.lastOption.isEmpty =>
           result += ListBuffer(line)
         case (result, line) =>
-          result.last += line
+          result.lastOption.foreach(_ += line)
           result
       }
       .map(buffer => buffer.toList)
