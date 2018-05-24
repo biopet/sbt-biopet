@@ -1,11 +1,18 @@
 language: scala
 
 scala:
-  - 2.11.11
+  - 2.12.5
+
+# Docker required to test plugin fully.
+sudo: required
+services:
+  - docker
 
 script:
-  - sbt clean scripted scalafmt headerCheck
+  - sbt clean headerCheck scalafmt
   - "git diff --exit-code || (echo ERROR: Git changes detected, please regenerate the readme and run scalafmt with: sbt headerCreate scalafmt && exit 1)"
+  - sbt clean coverage test scripted coverageReport coverageAggregate
+
 #after_success:
 #  - sbt coveralls
 #  - bash <(curl -s https://codecov.io/bash)

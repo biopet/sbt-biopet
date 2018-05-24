@@ -54,6 +54,9 @@ import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
 }
 import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
+import nl.biopet.bioconda.BiocondaPlugin
+import nl.biopet.bioconda.BiocondaPlugin.autoImport._
+import nl.biopet.sbtbiopet.BiopetUtils.markdownExtractChapter
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import org.scoverage.coveralls.CoverallsPlugin
@@ -68,6 +71,8 @@ import sbtrelease.ReleasePlugin.autoImport.{
   releaseStepCommand
 }
 import scoverage.ScoverageSbtPlugin
+
+import scala.io.Source
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
 
@@ -130,12 +135,14 @@ object BiopetPlugin extends AutoPlugin {
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
+      BiocondaPlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
       biopetDocumentationSettings ++
       biopetHeaderSettings ++
-      biopetScalafmtSettings
+      biopetScalafmtSettings ++
+      biopetBiocondaSettings
   }
 
   /*
@@ -268,6 +275,67 @@ object BiopetPlugin extends AutoPlugin {
       .dependsOn(scalafmt in Sbt)
       .value
   )
+
+  protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
+    biopetReleaseInBioconda := biopetIsTool.value, // Only release tools, not libraries
+    biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
+    name in Bioconda := s"biopet-${normalizedName.value}",
+    biocondaCommand := s"biopet-${normalizedName.value}",
+    biocondaTestCommands := {
+      val command = biocondaCommand.value
+      Seq(s"$command --version", s"$command --help")
+    },
+    biocondaDescription := Def
+      .taskDyn {
+        val readme = Source.fromFile(biopetReadmePath.value).mkString
+        if (biopetIsTool.value) {
+          Def
+            .task {
+              Some({
+                markdownExtractChapter(readme,
+                                       name.value,
+                                       includeHeader = false).trim + "\n\n" +
+                  markdownExtractChapter(readme,
+                                         "Documentation",
+                                         includeHeader = false).trim
+              }
+              // Replace all newlines with space for cosmetic reasons
+                .replaceAll("([^\\n])(\\n)([^\\n\\-+*0-9])", "$1 $3")
+                // Remove whitespace from beginning and end of string.
+                .trim)
+            }
+        } else Def.task { Some("") }
+      }
+      .dependsOn(biopetGenerateReadme)
+      .value,
+    biocondaSummary := Def
+      .taskDyn {
+        val readme = Source.fromFile(biopetReadmePath.value).mkString
+        if (biopetIsTool.value) {
+          Def.task {
+            val description =
+              markdownExtractChapter(readme, name.value, includeHeader = false)
+            // Assuming the first sentence ends with .
+            description.split("\\.").headOption match {
+              case Some(s) => { s + "." }.replace("\n", " ").trim
+              case _ =>
+                s"This summary for ${(name in Bioconda).value} was automatically generated."
+            }
+
+          }
+        } else Def.task { "" }
+      }
+      .dependsOn(biopetGenerateReadme)
+      .value,
+    biocondaRelease :=
+      Def.taskDyn {
+        if (biopetIsTool.value && biopetReleaseInBioconda.value) {
+          BiocondaPlugin.releaseProcedure()
+        }
+        // Utils are not released
+        else Def.task {}
+      }.value
+  )
   /*
    * The merge strategy that is used in biopet projects
    */
@@ -285,17 +353,17 @@ object BiopetPlugin extends AutoPlugin {
       xs map {
         _.toLowerCase
       } match {
-        case ("manifest.mf" :: Nil) | ("index.list" :: Nil) |
-            ("dependencies" :: Nil) =>
+        case "manifest.mf" :: Nil | "index.list" :: Nil |
+            "dependencies" :: Nil =>
           MergeStrategy.discard
-        case ps @ (_ :: _)
+        case ps @ _ :: _
             if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
           MergeStrategy.discard
         case "plexus" :: _ =>
           MergeStrategy.discard
         case "services" :: _ =>
           MergeStrategy.filterDistinctLines
-        case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
+        case "spring.schemas" :: Nil | "spring.handlers" :: Nil =>
           MergeStrategy.filterDistinctLines
         case _ => MergeStrategy.first
       }
@@ -336,6 +404,7 @@ object BiopetPlugin extends AutoPlugin {
       releaseStepCommand("ghpagesPushSite"),
       pushChanges,
       releaseStepCommand("githubRelease"),
+      releaseStepCommand("biocondaRelease"),
       releaseStepCommand("git checkout develop"),
       releaseStepCommand("git merge master"),
       setNextVersion,
@@ -357,8 +426,8 @@ object BiopetPlugin extends AutoPlugin {
           // Take the relative path, so only values within the
           // ghpagesRepository are taken into account.
           val empty: File = new File("")
-          val relativePath =
-            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString()
+          val relativePath: TagName =
+            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString
           if (isSnapshot.value) {
             relativePath.contains("develop")
           } else {

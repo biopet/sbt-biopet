@@ -27,7 +27,7 @@ publishMavenStyle := true
 
 sbtPlugin := true
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.5"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
@@ -74,7 +74,8 @@ releaseProcess := Seq[ReleaseStep](
   commitNextVersion,
   pushChanges
 )
-
+libraryDependencies += "org.testng" % "testng" % "6.14.2" % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
 libraryDependencies ++= Seq(
   Defaults.sbtPluginExtra(
     "com.typesafe.sbt" % "sbt-ghpages" % "0.6.2",
@@ -138,6 +139,11 @@ libraryDependencies ++= Seq(
   ),
   Defaults.sbtPluginExtra(
     "ohnosequences" % "sbt-github-release" % "0.7.0",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra(
+    "com.github.biopet" % "sbt-bioconda" % "0.1",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   )

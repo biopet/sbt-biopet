@@ -27,12 +27,14 @@ trait BiopetKeys {
   lazy val biopetDocsDir = SettingKey[File](
     "Where the markdown docs are generated that can be processed with LAIKA")
   lazy val biopetReadmePath =
-    SettingKey[File]("Where the project's readme is stored")
+    settingKey[File]("Where the project's readme is stored")
   lazy val biopetUrlName =
-    SettingKey[String]("The name of the tool or util in github URLS")
+    settingKey[String]("The name of the tool or util in github URLS")
   lazy val biopetGenerateDocs = taskKey[Unit]("Generate documentation files")
   lazy val biopetGenerateReadme = taskKey[Unit]("Generate readme")
-  lazy val biopetIsTool = SettingKey[Boolean]("Whether the project is a tool")
+  lazy val biopetIsTool = settingKey[Boolean]("Whether the project is a tool")
+  lazy val biopetReleaseInBioconda =
+    settingKey[Boolean]("Whether the tool should be released in bioconda")
   lazy val githubOrganization =
-    SettingKey[String]("The organization name on github")
+    settingKey[String]("The organization name on github")
 }

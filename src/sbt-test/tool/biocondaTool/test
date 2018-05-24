@@ -1,0 +1,13 @@
+> biocondaRelease
+# Release should not work with biopetReleaseInBioconda := false
+-$ exists target/recipes
+> biocondaUpdatedRepository
+> checkRepo
+> biocondaUpdatedBranch
+> biocondaCreateRecipe
+> checkRecipes
+$ exists target/recipes
+> biocondaAddRecipes
+> checkCopy
+> biocondaTestRecipes
+> deleteTmp
