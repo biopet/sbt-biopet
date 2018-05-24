@@ -62,10 +62,9 @@ object BiopetUtils {
       }
     })
     correctChapter match {
-      case Some(x) => {
+      case Some(x) =>
         val drop: Int = if (includeHeader) 0 else 1
         x.drop(drop).mkString(lineSeparator)
-      }
       case _ =>
         throw new Exception(
           "Cannot validate correct chapter after parsing. " +
@@ -86,8 +85,8 @@ object BiopetUtils {
         if (splitter(line)) result += ListBuffer(line)
         else
           result.lastOption match {
-            case Some(lb) => result.last += line
-            case None     => result += ListBuffer(line)
+            case Some(_) => result.last += line
+            case None    => result += ListBuffer(line)
           }
         result
     }

@@ -353,17 +353,17 @@ object BiopetPlugin extends AutoPlugin {
       xs map {
         _.toLowerCase
       } match {
-        case ("manifest.mf" :: Nil) | ("index.list" :: Nil) |
-            ("dependencies" :: Nil) =>
+        case "manifest.mf" :: Nil | "index.list" :: Nil |
+            "dependencies" :: Nil =>
           MergeStrategy.discard
-        case ps @ (_ :: _)
+        case ps @ _ :: _
             if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
           MergeStrategy.discard
         case "plexus" :: _ =>
           MergeStrategy.discard
         case "services" :: _ =>
           MergeStrategy.filterDistinctLines
-        case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
+        case "spring.schemas" :: Nil | "spring.handlers" :: Nil =>
           MergeStrategy.filterDistinctLines
         case _ => MergeStrategy.first
       }
