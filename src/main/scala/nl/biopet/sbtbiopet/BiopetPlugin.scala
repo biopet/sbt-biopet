@@ -277,7 +277,7 @@ object BiopetPlugin extends AutoPlugin {
   )
 
   protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
-    biopetReleaseInBioconda := true,
+    biopetReleaseInBioconda := biopetIsTool.value, // Only release tools, not libraries
     biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
     name in Bioconda := s"biopet-${normalizedName.value}",
     biocondaCommand := s"biopet-${normalizedName.value}",
