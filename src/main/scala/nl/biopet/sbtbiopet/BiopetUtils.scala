@@ -34,17 +34,16 @@ object BiopetUtils {
     */
   def splitStringList(stringList: List[String],
                       splitter: String => Boolean): List[List[String]] = {
-    val buffers = stringList.foldLeft(ListBuffer[ListBuffer[String]]()) {
-      case (result, line) =>
-        if (splitter(line)) result += ListBuffer(line)
-        else
-          result.lastOption match {
-            case Some(_) => result.last += line
-            case None    => result += ListBuffer(line)
-          }
-        result
-    }
-    buffers.map(buffer => buffer.toList).toList
+    stringList
+      .foldLeft(ListBuffer[ListBuffer[String]]()) {
+        case (result, line) if (splitter(line)) || result.lastOption.isEmpty =>
+          result += ListBuffer(line)
+        case (result, line) =>
+          result.last += line
+          result
+      }
+      .map(buffer => buffer.toList)
+      .toList
   }
 
   /**
@@ -82,6 +81,14 @@ object BiopetUtils {
     val text = markdown.split(lineSeparator).toList
     val chapters = splitStringList(text, matcher)
 
+    // In a list of lists of string. Find the list that starts with
+    // the string that matches the chapter regex.
+    // if so return that chapter by concatenating the lines using the
+    // lineSeparator. Optionally drop the first line if the header
+    // should not be included.
+    // Throw an error if the chapter is not found. This should not occur
+    // since the chapter's existence has already been evaluated before
+    // this point.
     chapters
       .find(lines =>
         lines.headOption.exists(chapterRegex.findFirstMatchIn(_).isDefined))
