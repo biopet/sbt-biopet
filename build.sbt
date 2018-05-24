@@ -74,8 +74,8 @@ releaseProcess := Seq[ReleaseStep](
   commitNextVersion,
   pushChanges
 )
-libraryDependencies += "org.testng" % "testng" % "6.14.2" % "test"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+libraryDependencies += "org.testng" % "testng" % "6.14.2" % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
 libraryDependencies ++= Seq(
   Defaults.sbtPluginExtra(
     "com.typesafe.sbt" % "sbt-ghpages" % "0.6.2",
