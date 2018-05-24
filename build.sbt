@@ -27,7 +27,7 @@ publishMavenStyle := true
 
 sbtPlugin := true
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.5"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
