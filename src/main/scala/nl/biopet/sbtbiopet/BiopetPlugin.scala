@@ -285,6 +285,7 @@ object BiopetPlugin extends AutoPlugin {
       val command = biocondaCommand.value
       Seq(s"$command --version", s"$command --help")
     },
+    biocondaRequirements := Seq("openjdk>=8,<9"), // OpenJDK should be 8. Not 9 or higher.
     biocondaDescription := Def
       .taskDyn {
         val readme = Source.fromFile(biopetReadmePath.value).mkString
