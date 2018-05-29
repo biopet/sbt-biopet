@@ -298,7 +298,7 @@ object BiopetPlugin extends AutoPlugin {
                                        name.value,
                                        includeHeader = false).trim +
                   s"\n\nFor documentation and manuals visit our github.io page: " +
-                  s"https://${githubOrganization.value}.github.io/$biopetUrlName"
+                  s"https://${githubOrganization.value}.github.io/${biopetUrlName.value}"
               }
               // Remove whitespace from beginning and end of string.
               .trim)
