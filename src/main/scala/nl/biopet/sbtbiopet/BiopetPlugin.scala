@@ -297,9 +297,8 @@ object BiopetPlugin extends AutoPlugin {
                 markdownExtractChapter(readme,
                                        name.value,
                                        includeHeader = false).trim + "\n\n" +
-                  markdownExtractChapter(readme,
-                                         "Documentation",
-                                         includeHeader = false).trim
+                  s"For documentation and manuals visit our github.io page: " +
+                  s"https://${githubOrganization.value}.github.io/$biopetUrlName"
               }
               // Replace all newlines with space for cosmetic reasons
                 .replaceAll("([^\\n])(\\n)([^\\n\\-+*0-9])", "$1 $3")
