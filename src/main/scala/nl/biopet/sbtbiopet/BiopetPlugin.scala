@@ -300,8 +300,8 @@ object BiopetPlugin extends AutoPlugin {
                   s"\n\nFor documentation and manuals visit our github.io page: " +
                   s"https://${githubOrganization.value}.github.io/$biopetUrlName"
               }
-                // Remove whitespace from beginning and end of string.
-                .trim)
+              // Remove whitespace from beginning and end of string.
+              .trim)
             }
         } else Def.task { Some("") }
       }
