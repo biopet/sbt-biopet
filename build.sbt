@@ -83,7 +83,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "org.planet42" % "laika-sbt" % "0.7.5",
+    "org.planet42" % "laika-sbt" % "0.8.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
@@ -98,7 +98,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "org.xerial.sbt" % "sbt-sonatype" % "2.0",
+    "org.xerial.sbt" % "sbt-sonatype" % "2.3",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
@@ -108,12 +108,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.github.gseitz" % "sbt-release" % "1.0.7",
-    (sbtBinaryVersion in pluginCrossBuild).value,
-    (scalaBinaryVersion in pluginCrossBuild).value
-  ),
-  Defaults.sbtPluginExtra(
-    "org.scoverage" % "sbt-coveralls" % "1.2.2",
+    "com.github.gseitz" % "sbt-release" % "1.0.8",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
@@ -123,7 +118,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "de.heikoseeberger" % "sbt-header" % "4.1.0",
+    "de.heikoseeberger" % "sbt-header" % "5.0.0",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
