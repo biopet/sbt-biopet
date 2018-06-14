@@ -59,7 +59,6 @@ import nl.biopet.bioconda.BiocondaPlugin.autoImport._
 import nl.biopet.sbtbiopet.BiopetUtils.markdownExtractChapter
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
-import org.scoverage.coveralls.CoverallsPlugin
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
@@ -131,7 +130,6 @@ object BiopetPlugin extends AutoPlugin {
       SiteScaladocPlugin.projectSettings ++
       LaikaSitePlugin.projectSettings ++
       ScalafmtSbtPlugin.projectSettings ++
-      CoverallsPlugin.projectSettings ++
       ScoverageSbtPlugin.projectSettings ++
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
