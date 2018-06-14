@@ -225,7 +225,8 @@ object BiopetPlugin extends AutoPlugin {
         GithubRelease.defs.githubTokenFromFile(
           GithubRelease.defs.defaultTokenFile)
     },
-    releaseProcess := biopetReleaseProcess
+    releaseProcess := (if (biopetIsTool.value) biopetToolReleaseProcess
+                       else biopetReleaseProcess)
   )
 
   /*
@@ -392,10 +393,41 @@ object BiopetPlugin extends AutoPlugin {
       runClean,
       runTest,
       setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      releaseStepCommand(s"sonatypeOpen ${name.value}"),
+      releaseStepCommand("publishSigned"),
+      releaseStepCommand("sonatypeReleaseAll"),
+      releaseStepCommand("ghpagesPushSite"),
+      pushChanges,
+      releaseStepCommand("githubRelease"),
+      releaseStepCommand("git checkout develop"),
+      releaseStepCommand("git merge master"),
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    )
+  }
+
+  /*
+   * The ReleaseProcess for use with the sbt-release plugin
+   */
+  protected def biopetToolReleaseProcess: Seq[ReleaseStep] = {
+    Seq[ReleaseStep](
+      releaseStepCommand("git fetch"),
+      releaseStepCommand("git checkout master"),
+      releaseStepCommand("git pull"),
+      releaseStepCommand("git merge origin/develop"),
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
       releaseStepCommand("set test in assembly := {}"),
       releaseStepCommand("assembly"),
       commitReleaseVersion,
       tagRelease,
+      releaseStepCommand(s"sonatypeOpen ${name.value}"),
       releaseStepCommand("publishSigned"),
       releaseStepCommand("sonatypeReleaseAll"),
       releaseStepCommand("ghpagesPushSite"),
