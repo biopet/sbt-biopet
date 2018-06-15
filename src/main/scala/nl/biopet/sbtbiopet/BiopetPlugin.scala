@@ -225,8 +225,8 @@ object BiopetPlugin extends AutoPlugin {
         GithubRelease.defs.githubTokenFromFile(
           GithubRelease.defs.defaultTokenFile)
     },
-    releaseProcess := (if (biopetIsTool.value) biopetToolReleaseProcess
-                       else biopetReleaseProcess)
+    releaseProcess := (if (biopetIsTool.value) biopetToolReleaseProcess.value
+                       else biopetReleaseProcess.value)
   )
 
   /*
@@ -382,64 +382,68 @@ object BiopetPlugin extends AutoPlugin {
   /*
    * The ReleaseProcess for use with the sbt-release plugin
    */
-  protected def biopetReleaseProcess: Seq[ReleaseStep] = {
-    Seq[ReleaseStep](
-      releaseStepCommand("git fetch"),
-      releaseStepCommand("git checkout master"),
-      releaseStepCommand("git pull"),
-      releaseStepCommand("git merge origin/develop"),
-      checkSnapshotDependencies,
-      inquireVersions,
-      runClean,
-      runTest,
-      setReleaseVersion,
-      commitReleaseVersion,
-      tagRelease,
-      releaseStepCommand(s"sonatypeOpen ${name.value}"),
-      releaseStepCommand("publishSigned"),
-      releaseStepCommand("sonatypeReleaseAll"),
-      releaseStepCommand("ghpagesPushSite"),
-      pushChanges,
-      releaseStepCommand("githubRelease"),
-      releaseStepCommand("git checkout develop"),
-      releaseStepCommand("git merge master"),
-      setNextVersion,
-      commitNextVersion,
-      pushChanges
-    )
+  protected def biopetReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting[Seq[ReleaseStep]] {
+      Seq[ReleaseStep](
+        releaseStepCommand("git fetch"),
+        releaseStepCommand("git checkout master"),
+        releaseStepCommand("git pull"),
+        releaseStepCommand("git merge origin/develop"),
+        checkSnapshotDependencies,
+        inquireVersions,
+        runClean,
+        runTest,
+        setReleaseVersion,
+        commitReleaseVersion,
+        tagRelease,
+        releaseStepCommand(s"sonatypeOpen ${name.value}"),
+        releaseStepCommand("publishSigned"),
+        releaseStepCommand("sonatypeReleaseAll"),
+        releaseStepCommand("ghpagesPushSite"),
+        pushChanges,
+        releaseStepCommand("githubRelease"),
+        releaseStepCommand("git checkout develop"),
+        releaseStepCommand("git merge master"),
+        setNextVersion,
+        commitNextVersion,
+        pushChanges
+      )
+    }
   }
 
   /*
    * The ReleaseProcess for use with the sbt-release plugin
    */
-  protected def biopetToolReleaseProcess: Seq[ReleaseStep] = {
-    Seq[ReleaseStep](
-      releaseStepCommand("git fetch"),
-      releaseStepCommand("git checkout master"),
-      releaseStepCommand("git pull"),
-      releaseStepCommand("git merge origin/develop"),
-      checkSnapshotDependencies,
-      inquireVersions,
-      runClean,
-      runTest,
-      setReleaseVersion,
-      releaseStepCommand("set test in assembly := {}"),
-      releaseStepCommand("assembly"),
-      commitReleaseVersion,
-      tagRelease,
-      releaseStepCommand(s"sonatypeOpen ${name.value}"),
-      releaseStepCommand("publishSigned"),
-      releaseStepCommand("sonatypeReleaseAll"),
-      releaseStepCommand("ghpagesPushSite"),
-      pushChanges,
-      releaseStepCommand("githubRelease"),
-      releaseStepCommand("biocondaRelease"),
-      releaseStepCommand("git checkout develop"),
-      releaseStepCommand("git merge master"),
-      setNextVersion,
-      commitNextVersion,
-      pushChanges
-    )
+  protected def biopetToolReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting {
+      Seq[ReleaseStep](
+        releaseStepCommand("git fetch"),
+        releaseStepCommand("git checkout master"),
+        releaseStepCommand("git pull"),
+        releaseStepCommand("git merge origin/develop"),
+        checkSnapshotDependencies,
+        inquireVersions,
+        runClean,
+        runTest,
+        setReleaseVersion,
+        releaseStepCommand("set test in assembly := {}"),
+        releaseStepCommand("assembly"),
+        commitReleaseVersion,
+        tagRelease,
+        releaseStepCommand(s"sonatypeOpen ${name.value}"),
+        releaseStepCommand("publishSigned"),
+        releaseStepCommand("sonatypeReleaseAll"),
+        releaseStepCommand("ghpagesPushSite"),
+        pushChanges,
+        releaseStepCommand("githubRelease"),
+        releaseStepCommand("biocondaRelease"),
+        releaseStepCommand("git checkout develop"),
+        releaseStepCommand("git merge master"),
+        setNextVersion,
+        commitNextVersion,
+        pushChanges
+      )
+    }
   }
 
   /*
