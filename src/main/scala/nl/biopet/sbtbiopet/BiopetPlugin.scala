@@ -379,10 +379,7 @@ object BiopetPlugin extends AutoPlugin {
         Some(Opts.resolver.sonatypeStaging)
     }
 
-  /*
-   * The ReleaseProcess for use with the sbt-release plugin
-   */
-  protected def biopetReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
+  protected def biopetReleaseStepsStart: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
         releaseStepCommand("git fetch"),
@@ -395,13 +392,50 @@ object BiopetPlugin extends AutoPlugin {
         runTest,
         setReleaseVersion,
         commitReleaseVersion,
-        tagRelease,
+        tagRelease
+      )
+    }
+  }
+
+  protected def biopetReleaseStepsSonatype: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting[Seq[ReleaseStep]] {
+      Seq[ReleaseStep](
         releaseStepCommand(s"sonatypeOpen ${name.value}"),
         releaseStepCommand("publishSigned"),
-        releaseStepCommand("sonatypeReleaseAll"),
+        releaseStepCommand("sonatypeReleaseAll")
+      )
+    }
+  }
+
+  protected def biopetReleaseStepsGithub: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting[Seq[ReleaseStep]] {
+      Seq[ReleaseStep](
         releaseStepCommand("ghpagesPushSite"),
         pushChanges,
-        releaseStepCommand("githubRelease"),
+        releaseStepCommand("githubRelease")
+      )
+    }
+  }
+
+  protected def biopetReleaseStepsBioconda: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting[Seq[ReleaseStep]] {
+      Seq[ReleaseStep](
+        releaseStepCommand("biocondaRelease")
+      )
+    }
+  }
+
+  protected def biopetReleaseStepsAssembly: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting[Seq[ReleaseStep]] {
+      Seq[ReleaseStep] (
+        releaseStepCommand("set test in assembly := {}"),
+        releaseStepCommand("assembly")
+      )
+    }
+  }
+  protected def biopetReleaseStepsNextVersion: Def.Initialize[Seq[ReleaseStep]] = {
+    Def.setting[Seq[ReleaseStep]] {
+      Seq[ReleaseStep](
         releaseStepCommand("git checkout develop"),
         releaseStepCommand("git merge master"),
         setNextVersion,
@@ -410,6 +444,14 @@ object BiopetPlugin extends AutoPlugin {
       )
     }
   }
+  /*
+   * The ReleaseProcess for use with the sbt-release plugin
+   */
+  protected def biopetReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
+        Def.setting[Seq[ReleaseStep]] {
+          Seq[ReleaseStep]()
+        }
+    }
 
   /*
    * The ReleaseProcess for use with the sbt-release plugin
@@ -426,8 +468,7 @@ object BiopetPlugin extends AutoPlugin {
         runClean,
         runTest,
         setReleaseVersion,
-        releaseStepCommand("set test in assembly := {}"),
-        releaseStepCommand("assembly"),
+
         commitReleaseVersion,
         tagRelease,
         releaseStepCommand(s"sonatypeOpen ${name.value}"),
@@ -436,7 +477,7 @@ object BiopetPlugin extends AutoPlugin {
         releaseStepCommand("ghpagesPushSite"),
         pushChanges,
         releaseStepCommand("githubRelease"),
-        releaseStepCommand("biocondaRelease"),
+
         releaseStepCommand("git checkout develop"),
         releaseStepCommand("git merge master"),
         setNextVersion,
