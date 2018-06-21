@@ -225,8 +225,9 @@ object BiopetPlugin extends AutoPlugin {
         GithubRelease.defs.githubTokenFromFile(
           GithubRelease.defs.defaultTokenFile)
     },
-    releaseProcess := (if (biopetIsTool.value) biopetToolReleaseProcess.value
-                       else biopetReleaseProcess.value)
+    biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
+    biopetReleaseInSonatype := true,
+    releaseProcess := biopetReleaseProcess.value
   )
 
   /*
@@ -276,7 +277,6 @@ object BiopetPlugin extends AutoPlugin {
   )
 
   protected def biopetBiocondaSettings: Seq[Setting[_]] = Def.settings(
-    biopetReleaseInBioconda := biopetIsTool.value, // Only release tools, not libraries
     biocondaGitUrl := "git@github.com:biopet/bioconda-recipes.git",
     name in Bioconda := s"biopet-${normalizedName.value}",
     biocondaCommand := s"biopet-${normalizedName.value}",
@@ -324,15 +324,7 @@ object BiopetPlugin extends AutoPlugin {
         } else Def.task { "" }
       }
       .dependsOn(biopetGenerateReadme)
-      .value,
-    biocondaRelease :=
-      Def.taskDyn {
-        if (biopetIsTool.value && biopetReleaseInBioconda.value) {
-          BiocondaPlugin.releaseProcedure()
-        }
-        // Utils are not released
-        else Def.task {}
-      }.value
+      .value
   )
   /*
    * The merge strategy that is used in biopet projects
@@ -427,13 +419,14 @@ object BiopetPlugin extends AutoPlugin {
 
   protected def biopetReleaseStepsAssembly: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep] (
+      Seq[ReleaseStep](
         releaseStepCommand("set test in assembly := {}"),
         releaseStepCommand("assembly")
       )
     }
   }
-  protected def biopetReleaseStepsNextVersion: Def.Initialize[Seq[ReleaseStep]] = {
+  protected def biopetReleaseStepsNextVersion
+    : Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
         releaseStepCommand("git checkout develop"),
@@ -448,42 +441,18 @@ object BiopetPlugin extends AutoPlugin {
    * The ReleaseProcess for use with the sbt-release plugin
    */
   protected def biopetReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
-        Def.setting[Seq[ReleaseStep]] {
-          Seq[ReleaseStep]()
-        }
-    }
-
-  /*
-   * The ReleaseProcess for use with the sbt-release plugin
-   */
-  protected def biopetToolReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting {
-      Seq[ReleaseStep](
-        releaseStepCommand("git fetch"),
-        releaseStepCommand("git checkout master"),
-        releaseStepCommand("git pull"),
-        releaseStepCommand("git merge origin/develop"),
-        checkSnapshotDependencies,
-        inquireVersions,
-        runClean,
-        runTest,
-        setReleaseVersion,
-
-        commitReleaseVersion,
-        tagRelease,
-        releaseStepCommand(s"sonatypeOpen ${name.value}"),
-        releaseStepCommand("publishSigned"),
-        releaseStepCommand("sonatypeReleaseAll"),
-        releaseStepCommand("ghpagesPushSite"),
-        pushChanges,
-        releaseStepCommand("githubRelease"),
-
-        releaseStepCommand("git checkout develop"),
-        releaseStepCommand("git merge master"),
-        setNextVersion,
-        commitNextVersion,
-        pushChanges
-      )
+    Def.setting[Seq[ReleaseStep]] {
+      biopetReleaseStepsStart.value ++ {
+        if (biopetIsTool.value) biopetReleaseStepsAssembly.value else Seq()
+      } ++ {
+        if (biopetReleaseInSonatype.value) biopetReleaseStepsSonatype.value
+        else Seq()
+      } ++
+        biopetReleaseStepsGithub.value ++ {
+        if (biopetReleaseInBioconda.value) biopetReleaseStepsBioconda.value
+        else Seq()
+      } ++
+        biopetReleaseStepsNextVersion.value
     }
   }
 
