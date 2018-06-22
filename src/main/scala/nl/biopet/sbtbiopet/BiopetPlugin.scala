@@ -56,10 +56,7 @@ import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import nl.biopet.bioconda.BiocondaPlugin
 import nl.biopet.bioconda.BiocondaPlugin.autoImport._
-import nl.biopet.utils.Documentation.{
-  htmlRedirector,
-  markdownExtractChapter
-}
+import nl.biopet.utils.Documentation.{htmlRedirector, markdownExtractChapter}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import sbt.Keys._
