@@ -30,6 +30,7 @@ sbtPlugin := true
 scalaVersion := "2.12.6"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
 
 useGpg := true
 

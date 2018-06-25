@@ -9,6 +9,12 @@ biopetIsTool := true
 mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool")
 scalaVersion := "2.11.11"
 
+resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
+
+resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
+
 libraryDependencies += "com.github.biopet" %% "tool-utils" % "0.2"
 libraryDependencies += "com.github.biopet" %% "tool-test-utils" % "0.1" % Test
 

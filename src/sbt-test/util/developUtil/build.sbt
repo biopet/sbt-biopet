@@ -14,6 +14,8 @@ libraryDependencies += "org.yaml" % "snakeyaml" % "1.17"
 libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.25"
 libraryDependencies += "com.github.biopet" %% "test-utils" % "0.2" % Test
 
+resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
 
 TaskKey[Unit]("checkValues") := {
   val validGitRepo = "git@github.com:biopet/dummy-util.git"

@@ -24,6 +24,8 @@ biocondaRepository := biocondaTempDir.value
 biopetUrlName := "testtool"
 biopetIsTool := true
 biopetReleaseInBioconda := false
+resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
 checkRepo := Def.task {
   filesExistInDir(
     biocondaRepository.value,
