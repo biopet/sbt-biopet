@@ -67,6 +67,7 @@ import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport.{
   ReleaseStep,
+  releaseCrossBuild,
   releaseProcess,
   releaseStepCommand
 }
@@ -212,6 +213,7 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetReleaseSettings: Seq[Setting[_]] = Seq(
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
+    releaseCrossBuild := true,
     publishTo := biopetPublishTo.value,
     publishMavenStyle := true,
     useGpg := true,
