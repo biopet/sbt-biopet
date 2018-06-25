@@ -6,6 +6,8 @@ organization := "example.dummy"
 startYear := Some(2017)
 biopetUrlName := "dummytool"
 biopetIsTool := true
+biopetEnableCodacyCoverage := false
+
 mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool")
 scalaVersion := "2.11.11"
 
@@ -46,10 +48,15 @@ checkValues := {
   assert(
     biocondaSummary.value == "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     "Summary should be first sentence of description.")
-  assert(biocondaDescription.value.getOrElse("").contains(
-           "Aliquam bibendum tellus sed lectus tristique egestas."),
-         "Full tool description should be in biocondaDescription.")
-  assert(biocondaDescription.value.getOrElse("").contains("For documentation and manuals"),
+  assert(
+    biocondaDescription.value
+      .getOrElse("")
+      .contains("Aliquam bibendum tellus sed lectus tristique egestas."),
+    "Full tool description should be in biocondaDescription."
+  )
+  assert(biocondaDescription.value
+           .getOrElse("")
+           .contains("For documentation and manuals"),
          "Documentation link should be part of description")
   assert(!biocondaDescription.value.getOrElse("").contains("# Documentation"),
          "Headers should have been removed in description")

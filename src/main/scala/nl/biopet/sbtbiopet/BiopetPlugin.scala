@@ -23,6 +23,7 @@ package nl.biopet.sbtbiopet
 
 import java.io.File
 
+import com.codacy.CodacyCoveragePlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
   scalafmtOnCompile
@@ -103,22 +104,7 @@ object BiopetPlugin extends AutoPlugin {
    */
   def biopetBuildSettings: Seq[Setting[_]] = {
     super.buildSettings ++ AssemblyPlugin.buildSettings ++
-      ScoverageSbtPlugin.buildSettings ++
-      Seq(
-        commands += Command.command("biopetTest") { state =>
-          "scalafmt::test" ::
-            "test:scalafmt::test" ::
-            "sbt:scalafmt::test" ::
-            "headerCreate" ::
-            "coverage" ::
-            "test" ::
-            "coverageReport" ::
-            "coverageAggregate" ::
-            "makeSite" ::
-            "biopetGenerateReadme" ::
-            state
-        }
-      )
+      ScoverageSbtPlugin.buildSettings
   }
 
   /*
@@ -135,12 +121,14 @@ object BiopetPlugin extends AutoPlugin {
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
       BiocondaPlugin.projectSettings ++
+      CodacyCoveragePlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
       biopetDocumentationSettings ++
       biopetHeaderSettings ++
       biopetScalafmtSettings ++
+      biopetTestSettings ++
       biopetBiocondaSettings
   }
 
@@ -152,6 +140,32 @@ object BiopetPlugin extends AutoPlugin {
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
 
+  protected def biopetTestSettings: Seq[Setting[_]] = {
+    Def.settings(
+      biopetEnableCodacyCoverage := true,
+      commands += Command.command("biopetTest") { state =>
+        val cmds: List[String] =
+          List(
+            Some("scalafmt::test"),
+            Some("test:scalafmt::test"),
+            Some("sbt:scalafmt::test"),
+            Some("headerCreate"),
+            Some("coverage"),
+            Some("test"),
+            Some("coverageReport"),
+            Some("coverageAggregate"), {
+              if (biopetEnableCodacyCoverage.value) Some("codacyCoverage")
+              else None
+            },
+            Some("makeSite"),
+            Some("biopetGenerateReadme")
+          ).flatten
+
+        cmds.foldRight(state)(_ :: _)
+
+      }
+    )
+  }
   /*
    * Contains al settings related to the license header
    */
