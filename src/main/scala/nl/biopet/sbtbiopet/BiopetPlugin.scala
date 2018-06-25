@@ -151,7 +151,8 @@ object BiopetPlugin extends AutoPlugin {
           "test" ::
           "coverageReport" ::
           "coverageAggregate" :: {
-          if (biopetEnableCodacyCoverage.value) "codacyCoverage" else " "
+          if (biopetEnableCodacyCoverage.value) "codacyCoverage" else "last-grep ''"
+          // "last-grep ''" does nothing. Empty of message command not possible
         } ::
           "makeSite" ::
           "biopetGenerateReadme" ::
