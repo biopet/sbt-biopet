@@ -76,7 +76,7 @@ releaseProcess := Seq[ReleaseStep](
 )
 libraryDependencies += "org.testng" % "testng" % "6.14.3" % Test
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
-libraryDependencies += "com.github.biopet" %% "common-utils" % "0.6-SNAPSHOT"
+libraryDependencies += "com.github.biopet" %% "common-utils" % "0.6"
 libraryDependencies ++= Seq(
   Defaults.sbtPluginExtra(
     "com.typesafe.sbt" % "sbt-ghpages" % "0.6.2",
