@@ -39,4 +39,6 @@ trait BiopetKeys {
     settingKey[Boolean]("Whether the tool should be released in bioconda")
   lazy val githubOrganization =
     settingKey[String]("The organization name on github")
+  lazy val biopetEnableCodacyCoverage = settingKey[Boolean](
+    "Whether codacy coverage should be enabled in bopetTest")
 }

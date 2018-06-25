@@ -113,8 +113,9 @@ object BiopetPlugin extends AutoPlugin {
             "coverage" ::
             "test" ::
             "coverageReport" ::
-            "coverageAggregate" ::
-            "codacyCoverage" ::
+            "coverageAggregate" :: {
+            if (biopetEnableCodacyCoverage.value) "codacyCoverage" else " "
+          } ::
             "makeSite" ::
             "biopetGenerateReadme" ::
             state
@@ -195,7 +196,8 @@ object BiopetPlugin extends AutoPlugin {
         s"scm:git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git"
       )),
     git.remoteRepo := s"git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git",
-    biopetIsTool := false // This should not have to be defined for utils.
+    biopetIsTool := false, // This should not have to be defined for utils.
+    biopetEnableCodacyCoverage := true
   )
 
   /*
