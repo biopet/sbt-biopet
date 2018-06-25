@@ -113,6 +113,7 @@ object BiopetPlugin extends AutoPlugin {
             "test" ::
             "coverageReport" ::
             "coverageAggregate" ::
+            "codacyCoverage" ::
             "makeSite" ::
             "biopetGenerateReadme" ::
             state

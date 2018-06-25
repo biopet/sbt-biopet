@@ -143,5 +143,9 @@ libraryDependencies ++= Seq(
     "com.github.biopet" % "sbt-bioconda" % "0.2",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
+  ),
+  Defaults.sbtPluginExtra("com.codacy" % "sbt-codacy-coverage" % "1.3.5",
+  (sbtBinaryVersion in pluginCrossBuild).value,
+  (scalaBinaryVersion in pluginCrossBuild).value
   )
 )
