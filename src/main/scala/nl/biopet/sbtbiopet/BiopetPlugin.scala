@@ -103,24 +103,7 @@ object BiopetPlugin extends AutoPlugin {
    */
   def biopetBuildSettings: Seq[Setting[_]] = {
     super.buildSettings ++ AssemblyPlugin.buildSettings ++
-      ScoverageSbtPlugin.buildSettings ++
-      Seq(
-        commands += Command.command("biopetTest") { state =>
-          "scalafmt::test" ::
-            "test:scalafmt::test" ::
-            "sbt:scalafmt::test" ::
-            "headerCreate" ::
-            "coverage" ::
-            "test" ::
-            "coverageReport" ::
-            "coverageAggregate" :: {
-            if (biopetEnableCodacyCoverage.value) "codacyCoverage" else " "
-          } ::
-            "makeSite" ::
-            "biopetGenerateReadme" ::
-            state
-        }
-      )
+      ScoverageSbtPlugin.buildSettings
   }
 
   /*
@@ -144,6 +127,7 @@ object BiopetPlugin extends AutoPlugin {
       biopetDocumentationSettings ++
       biopetHeaderSettings ++
       biopetScalafmtSettings ++
+    biopetTestSettings ++
       biopetBiocondaSettings
   }
 
@@ -155,6 +139,26 @@ object BiopetPlugin extends AutoPlugin {
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
 
+  protected def biopetTestSettings = Seq[Setting[_]] = {
+    Def.settings(
+      biopetEnableCodacyCoverage := true,
+      commands += Command.command("biopetTest") { state =>
+        "scalafmt::test" ::
+          "test:scalafmt::test" ::
+          "sbt:scalafmt::test" ::
+          "headerCreate" ::
+          "coverage" ::
+          "test" ::
+          "coverageReport" ::
+          "coverageAggregate" :: {
+          if (biopetEnableCodacyCoverage.value) "codacyCoverage" else " "
+        } ::
+          "makeSite" ::
+          "biopetGenerateReadme" ::
+          state
+      }
+    )
+  }
   /*
    * Contains al settings related to the license header
    */
@@ -197,7 +201,7 @@ object BiopetPlugin extends AutoPlugin {
       )),
     git.remoteRepo := s"git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git",
     biopetIsTool := false, // This should not have to be defined for utils.
-    biopetEnableCodacyCoverage := true
+
   )
 
   /*
