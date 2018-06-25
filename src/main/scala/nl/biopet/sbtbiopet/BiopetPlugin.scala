@@ -143,20 +143,22 @@ object BiopetPlugin extends AutoPlugin {
     Def.settings(
       biopetEnableCodacyCoverage := true,
       commands += Command.command("biopetTest") { state =>
-        "scalafmt::test" ::
-          "test:scalafmt::test" ::
-          "sbt:scalafmt::test" ::
-          "headerCreate" ::
-          "coverage" ::
-          "test" ::
-          "coverageReport" ::
-          "coverageAggregate" :: {
-          if (biopetEnableCodacyCoverage.value) "codacyCoverage" else "last-grep ''"
-          // "last-grep ''" does nothing. Empty of message command not possible
-        } ::
-          "makeSite" ::
-          "biopetGenerateReadme" ::
-          state
+        val cmds: List[String] =
+          List(
+            Some("scalafmt,test"),
+          Some("test:scalafmt,test") ,
+          Some("sbt:scalafmt,test") ,
+          Some("headerCreate") ,
+          Some("coverage") ,
+          Some("test") ,
+          Some("coverageReport") ,
+          Some("coverageAggregate") , {
+          if (biopetEnableCodacyCoverage.value) Some("codacyCoverage") else None
+        } ,
+          Some("makeSite") ,
+          Some("biopetGenerateReadme")).flatten
+
+        cmds.foldRight(state)(_ :: _)
       }
     )
   }
@@ -201,8 +203,7 @@ object BiopetPlugin extends AutoPlugin {
         s"scm:git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git"
       )),
     git.remoteRepo := s"git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git",
-    biopetIsTool := false, // This should not have to be defined for utils.
-
+    biopetIsTool := false // This should not have to be defined for utils.
   )
 
   /*
