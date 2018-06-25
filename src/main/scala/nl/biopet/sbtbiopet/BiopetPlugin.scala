@@ -21,7 +21,7 @@
 
 package nl.biopet.sbtbiopet
 
-import java.io.{File, PrintWriter}
+import java.io.File
 
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
@@ -56,7 +56,7 @@ import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import nl.biopet.bioconda.BiocondaPlugin
 import nl.biopet.bioconda.BiocondaPlugin.autoImport._
-import nl.biopet.sbtbiopet.BiopetUtils.markdownExtractChapter
+import nl.biopet.utils.Documentation.{htmlRedirector, markdownExtractChapter}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import sbt.Keys._
@@ -564,44 +564,4 @@ object BiopetPlugin extends AutoPlugin {
           .dependsOn(compile in Compile)
       } else Def.task[Unit] {}
     }
-
-  /**
-    * Generates a htmlPage that redirects automatically to the link provided.
-    * @param outputFile The file that will contain the redirect, for example: some_dir/index.html
-    * @param link The file to redirect to, for example: ../index.html
-    * @param title The title of the page.
-    * @param redirectText If javascript does not work, this link text is displayed.
-    */
-  def htmlRedirector(
-      outputFile: File,
-      link: String,
-      title: String = "Project Documentation",
-      redirectText: String = "Go to the project documentation"
-  ): Unit = {
-    val fileWriter = new PrintWriter(outputFile)
-    val redirectHtml: String =
-      s"""<!DOCTYPE html>
-         |<html lang="en">
-         |<head>
-         |    <meta charset="UTF-8">
-         |    <title>$title</title>
-         |    <script language="JavaScript">
-         |        <!--
-         |        function doRedirect()
-         |        {
-         |            window.location.replace("$link");
-         |        }
-         |        doRedirect();
-         |        //-->
-         |    </script>
-         |</head>
-         |<body>
-         |<a href="$link">$redirectText
-         |</a>
-         |</body>
-         |</html>
-       """.stripMargin
-    fileWriter.print(redirectHtml)
-    fileWriter.close()
-  }
 }
