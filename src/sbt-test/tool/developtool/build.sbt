@@ -6,7 +6,7 @@ organization := "example.dummy"
 startYear := Some(2017)
 biopetUrlName := "dummytool"
 biopetIsTool := true
-codacyProjectToken := "123"
+
 mainClass in assembly := Some(s"nl.biopet.tools.dummytool.DummyTool")
 scalaVersion := "2.11.11"
 
