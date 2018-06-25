@@ -128,7 +128,7 @@ object BiopetPlugin extends AutoPlugin {
       biopetDocumentationSettings ++
       biopetHeaderSettings ++
       biopetScalafmtSettings ++
-    biopetTestSettings ++
+      biopetTestSettings ++
       biopetBiocondaSettings
   }
 
@@ -146,20 +146,23 @@ object BiopetPlugin extends AutoPlugin {
       commands += Command.command("biopetTest") { state =>
         val cmds: List[String] =
           List(
-            Some("scalafmt,test"),
-          Some("test:scalafmt,test") ,
-          Some("sbt:scalafmt,test") ,
-          Some("headerCreate") ,
-          Some("coverage") ,
-          Some("test") ,
-          Some("coverageReport") ,
-          Some("coverageAggregate") , {
-          if (biopetEnableCodacyCoverage.value) Some("codacyCoverage") else None
-        } ,
-          Some("makeSite") ,
-          Some("biopetGenerateReadme")).flatten
+            Some("scalafmt::test"),
+            Some("test:scalafmt::test"),
+            Some("sbt:scalafmt::test"),
+            Some("headerCreate"),
+            Some("coverage"),
+            Some("test"),
+            Some("coverageReport"),
+            Some("coverageAggregate"), {
+              if (biopetEnableCodacyCoverage.value) Some("codacyCoverage")
+              else None
+            },
+            Some("makeSite"),
+            Some("biopetGenerateReadme")
+          ).flatten
 
         cmds.foldRight(state)(_ :: _)
+
       }
     )
   }
