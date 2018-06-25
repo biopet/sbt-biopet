@@ -144,8 +144,7 @@ libraryDependencies ++= Seq(
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
-  Defaults.sbtPluginExtra("com.codacy" % "sbt-codacy-coverage" % "1.3.5",
-  (sbtBinaryVersion in pluginCrossBuild).value,
-  (scalaBinaryVersion in pluginCrossBuild).value
-  )
+  Defaults.sbtPluginExtra("com.codacy" % "sbt-codacy-coverage" % "1.3.12",
+                          (sbtBinaryVersion in pluginCrossBuild).value,
+                          (scalaBinaryVersion in pluginCrossBuild).value)
 )
