@@ -139,7 +139,7 @@ object BiopetPlugin extends AutoPlugin {
       assemblyMergeStrategy in assembly := biopetMergeStrategy
     )
 
-  protected def biopetTestSettings = Seq[Setting[_]] = {
+  protected def biopetTestSettings: Seq[Setting[_]] = {
     Def.settings(
       biopetEnableCodacyCoverage := true,
       commands += Command.command("biopetTest") { state =>
