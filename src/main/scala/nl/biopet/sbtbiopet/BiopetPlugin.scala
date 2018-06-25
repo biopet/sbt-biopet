@@ -23,6 +23,7 @@ package nl.biopet.sbtbiopet
 
 import java.io.File
 
+import com.codacy.CodacyCoveragePlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
   scalafmtOnCompile
@@ -135,6 +136,7 @@ object BiopetPlugin extends AutoPlugin {
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
       BiocondaPlugin.projectSettings ++
+      CodacyCoveragePlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
