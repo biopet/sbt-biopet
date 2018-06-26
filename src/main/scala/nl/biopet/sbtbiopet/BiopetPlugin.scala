@@ -426,7 +426,7 @@ object BiopetPlugin extends AutoPlugin {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
         releaseStepCommand(
-          "biocondaVersion := releaseTagName.value.stripPrefix(\"v\")"), //Dynamically gets the version in the release process.
+          "set biocondaVersion := releaseTagName.value.stripPrefix(\"v\")"), //Dynamically gets the version in the release process.
         releaseStepCommand("biocondaRelease")
       )
     }
