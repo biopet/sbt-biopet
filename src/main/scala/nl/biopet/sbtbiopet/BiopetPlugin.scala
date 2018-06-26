@@ -21,8 +21,6 @@
 
 package nl.biopet.sbtbiopet
 
-import java.io.File
-
 import com.codacy.CodacyCoveragePlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
@@ -32,7 +30,6 @@ import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.ghpagesRepository
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
@@ -48,7 +45,6 @@ import nl.biopet.sbtbiopet.BiopetDocumentationSettings._
 import nl.biopet.sbtbiopet.BiopetReleaseSettings._
 import nl.biopet.utils.Documentation.markdownExtractChapter
 import ohnosequences.sbt.SbtGithubReleasePlugin
-import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._

@@ -87,34 +87,13 @@ object BiopetDocumentationSettings {
   protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
     Def.taskDyn {
       if (biopetIsTool.value) {
-        Def
-          .task[Unit] {
-            val r = (runner in Compile).value
-            val classPath = (fullClasspath in Compile).value
 
-            val streamsLogValue = streams.value.log
-
-            val args = Seq("--generateDocs",
-                           s"outputDir=${biopetDocsDir.value.toString}," +
-                             s"version=${version.value}," +
-                             s"release=${!isSnapshot.value}",
-                           version.value)
-
-            val mainClassString = (mainClass in assembly).value match {
-              case Some(x) => x
-              case _ =>
-                throw new IllegalStateException(
-                  "Mainclass should be defined for a tool.")
-            }
-            import Attributed.data
-            r.run(
-              mainClassString,
-              data(classPath),
-              args,
-              streamsLogValue
-            )
-
-          }
+        biopetToolDocsFunction(
+          Seq("--generateDocs",
+              s"outputDir=${biopetDocsDir.value.toString}," +
+                s"version=${version.value}," +
+                s"release=${!isSnapshot.value}",
+              version.value))
           .dependsOn(compile in Compile)
       } else
         Def.task[Unit] {
@@ -137,33 +116,34 @@ object BiopetDocumentationSettings {
   protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
     Def.taskDyn {
       if (biopetIsTool.value) {
-        Def
-          .task[Unit] {
-            val r = (runner in Compile).value
-            val classPath = (fullClasspath in Compile).value
-
-            val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-
-            val streamsLogValue = streams.value.log
-
-            val mainClassString = (mainClass in assembly).value match {
-              case Some(x) => x
-              case _ =>
-                throw new IllegalStateException(
-                  "Mainclass should be defined for a tool.")
-            }
-            import Attributed.data
-            r.run(
-              mainClassString,
-              data(classPath),
-              args,
-              streamsLogValue
-            )
-
-          }
+        biopetToolDocsFunction(
+          Seq("--generateReadme", biopetReadmePath.value.toString))
           .dependsOn(compile in Compile)
       } else Def.task[Unit] {}
     }
+
+  protected def biopetToolDocsFunction(
+      args: Seq[String]): Def.Initialize[Task[Unit]] = {
+    Def.task {
+      val r = (runner in Compile).value
+      val classPath = (fullClasspath in Compile).value
+      val streamsLogValue = streams.value.log
+
+      val mainClassString = (mainClass in assembly).value match {
+        case Some(x) => x
+        case _ =>
+          throw new IllegalStateException(
+            "Mainclass should be defined for a tool.")
+      }
+      import Attributed.data
+      r.run(
+        mainClassString,
+        data(classPath),
+        args,
+        streamsLogValue
+      )
+    }
+  }
   /*
    * The filter that is used by the ghpages plugin.
    * All files in this filter will be removed.
