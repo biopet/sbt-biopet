@@ -26,6 +26,7 @@ checkValues := {
   val validHomePage = Some(url("https://github.com/biopet/dummytool"))
   assert(git.remoteRepo.value == validGitRepo,
          s"'${git.remoteRepo.value}' does not equal '$validGitRepo'")
+  assert(biocondaVersion.value := version.value)
   assert(homepage.value == validHomePage,
          s"'${homepage.value}' does not equal '$validHomePage'")
   assert(useGpg.value, "useGpg should be true")
