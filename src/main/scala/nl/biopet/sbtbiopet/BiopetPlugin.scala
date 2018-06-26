@@ -65,12 +65,7 @@ import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{
-  ReleaseStep,
-  releaseCrossBuild,
-  releaseProcess,
-  releaseStepCommand
-}
+import sbtrelease.ReleasePlugin.autoImport._
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -243,6 +238,8 @@ object BiopetPlugin extends AutoPlugin {
     },
     biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
     biopetReleaseInSonatype := true,
+    biocondaVersion := releaseTagName.value
+      .stripPrefix("v"), //Dynamically gets the version in the release process.
     releaseProcess := biopetReleaseProcess.value
   )
 
