@@ -140,7 +140,7 @@ libraryDependencies ++= Seq(
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
   Defaults.sbtPluginExtra(
-    "com.github.biopet" % "sbt-bioconda" % "0.2",
+    "com.github.biopet" % "sbt-bioconda" % "0.3-SNAPSHOT" changing(),
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in pluginCrossBuild).value
   ),
