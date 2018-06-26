@@ -31,7 +31,7 @@ import sbt.Keys.name
 import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseStepCommand}
 import sbtrelease.ReleaseStateTransformations._
 
-object BiopetReleaseSteps {
+object BiopetReleaseSettings {
   protected def biopetReleaseStepsStart: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
