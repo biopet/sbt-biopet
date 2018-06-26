@@ -57,6 +57,7 @@ import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import nl.biopet.bioconda.BiocondaPlugin
 import nl.biopet.bioconda.BiocondaPlugin.autoImport._
+import nl.biopet.sbtbiopet.BiopetReleaseSteps._
 import nl.biopet.utils.Documentation.{htmlRedirector, markdownExtractChapter}
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
 import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
@@ -64,9 +65,7 @@ import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
-import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport._
-import sbtrelease.ReleaseStateTransformations.pushChanges
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -384,93 +383,6 @@ object BiopetPlugin extends AutoPlugin {
       else
         Some(Opts.resolver.sonatypeStaging)
     }
-
-  protected def biopetReleaseStepsStart: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("git fetch"),
-        releaseStepCommand("git checkout master"),
-        releaseStepCommand("git pull"),
-        releaseStepCommand("git merge origin/develop"),
-        checkSnapshotDependencies,
-        inquireVersions,
-        runClean,
-        runTest,
-        setReleaseVersion,
-        commitReleaseVersion,
-        tagRelease,
-        pushChanges
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsSonatype: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand(s"sonatypeOpen ${name.value}"),
-        releaseStepCommand("publishSigned"),
-        releaseStepCommand("sonatypeReleaseAll")
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsGithub: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("ghpagesPushSite"),
-        releaseStepCommand("githubRelease")
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsBioconda: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand(
-          "set biocondaVersion := releaseTagName.value.stripPrefix(\"v\")"), //Dynamically gets the version in the release process.
-        releaseStepCommand("biocondaRelease")
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsAssembly: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("set test in assembly := {}"),
-        releaseStepCommand("assembly")
-      )
-    }
-  }
-  protected def biopetReleaseStepsNextVersion
-    : Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("git checkout develop"),
-        releaseStepCommand("git merge master"),
-        setNextVersion,
-        commitNextVersion,
-        pushChanges
-      )
-    }
-  }
-  /*
-   * The ReleaseProcess for use with the sbt-release plugin
-   */
-  protected def biopetReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      biopetReleaseStepsStart.value ++ {
-        if (biopetIsTool.value) biopetReleaseStepsAssembly.value else Seq()
-      } ++ {
-        if (biopetReleaseInSonatype.value) biopetReleaseStepsSonatype.value
-        else Seq()
-      } ++
-        biopetReleaseStepsGithub.value ++ {
-        if (biopetReleaseInBioconda.value) biopetReleaseStepsBioconda.value
-        else Seq()
-      } ++
-        biopetReleaseStepsNextVersion.value
-    }
-  }
 
   /*
    * The filter that is used by the ghpages plugin.
