@@ -65,12 +65,8 @@ import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{
-  ReleaseStep,
-  releaseCrossBuild,
-  releaseProcess,
-  releaseStepCommand
-}
+import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleaseStateTransformations.pushChanges
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -402,7 +398,8 @@ object BiopetPlugin extends AutoPlugin {
         runTest,
         setReleaseVersion,
         commitReleaseVersion,
-        tagRelease
+        tagRelease,
+        pushChanges
       )
     }
   }
@@ -421,7 +418,6 @@ object BiopetPlugin extends AutoPlugin {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
         releaseStepCommand("ghpagesPushSite"),
-        pushChanges,
         releaseStepCommand("githubRelease")
       )
     }
@@ -430,6 +426,8 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetReleaseStepsBioconda: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
+        releaseStepCommand(
+          "set biocondaVersion := releaseTagName.value.stripPrefix(\"v\")"), //Dynamically gets the version in the release process.
         releaseStepCommand("biocondaRelease")
       )
     }
