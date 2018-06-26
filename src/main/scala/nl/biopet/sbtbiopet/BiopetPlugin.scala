@@ -31,7 +31,6 @@ import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
 import com.typesafe.sbt.SbtGit.git
-import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.ghpagesRepository
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
@@ -48,13 +47,12 @@ import nl.biopet.bioconda.BiocondaPlugin.autoImport._
 import nl.biopet.sbtbiopet.BiopetDocumentationSettings._
 import nl.biopet.sbtbiopet.BiopetReleaseSettings._
 import nl.biopet.utils.Documentation.markdownExtractChapter
+import ohnosequences.sbt.SbtGithubReleasePlugin
 import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
-import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
-import sbtrelease.ReleasePlugin.autoImport._
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -198,42 +196,6 @@ object BiopetPlugin extends AutoPlugin {
     biopetIsTool := false // This should not have to be defined for utils.
   )
 
-  /*
-   * A sequence of settings specific to release
-   */
-  protected def biopetReleaseSettings: Seq[Setting[_]] = Seq(
-    resolvers += Resolver.sonatypeRepo("snapshots"),
-    resolvers += Resolver.sonatypeRepo("releases"),
-    releaseCrossBuild := true,
-    publishTo := biopetPublishTo.value,
-    publishMavenStyle := true,
-    useGpg := true,
-    ghreleaseRepoName := biopetUrlName.value,
-    ghreleaseAssets := {
-      val assemblyPath = (assemblyOutputPath in assembly).value
-      if (biopetIsTool.value) Seq(assemblyPath) else Seq()
-    },
-    ghreleaseRepoOrg := githubOrganization.value,
-    //ghreleaseTitle same as upstream default. Specified here to be stable between releases.
-    ghreleaseTitle := { tagName =>
-      s"${name.value} $tagName"
-    },
-    // ghreleaseNotes generic message. (Empty message leads to prompt).
-    ghreleaseNotes := { tagName =>
-      s"Release ${tagName.stripPrefix("v")}"
-    },
-    // ghreleaseGithubToken copied from default for stability.
-    ghreleaseGithubToken := {
-      GithubRelease.defs.githubTokenFromEnv(
-        GithubRelease.defs.defaultTokenEnvVar) orElse
-        GithubRelease.defs.githubTokenFromFile(
-          GithubRelease.defs.defaultTokenFile)
-    },
-    biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
-    biopetReleaseInSonatype := true,
-    releaseProcess := biopetReleaseProcess.value
-  )
-
   protected def biopetScalafmtSettings: Seq[Setting[_]] = Seq(
     scalafmtOnCompile := true, // make sure scalafmt is run regularly during development
     // make sure scalafmt command reformats everything
@@ -335,35 +297,4 @@ object BiopetPlugin extends AutoPlugin {
       }
     case _ => MergeStrategy.first
   }
-
-  /*
-   * Biopet resolver.
-   */
-  protected def biopetPublishTo: Def.Initialize[Option[Resolver]] =
-    Def.setting {
-      if (isSnapshot.value)
-        Some(Opts.resolver.sonatypeSnapshots)
-      else
-        Some(Opts.resolver.sonatypeStaging)
-    }
-  protected def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
-    Def.setting {
-      new FileFilter {
-        def accept(f: File): Boolean = {
-          // Take the relative path, so only values within the
-          // ghpagesRepository are taken into account.
-          val empty: File = new File("")
-          val relativePath: TagName =
-            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString
-          if (isSnapshot.value) {
-            relativePath.contains("develop")
-          } else {
-            relativePath.contains(s"${version.value}") ||
-            // Also index.html needs to deleted to point to a new version.
-            f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
-          }
-        }
-      }
-    }
-
 }
