@@ -240,8 +240,6 @@ object BiopetPlugin extends AutoPlugin {
     },
     biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
     biopetReleaseInSonatype := true,
-    biocondaVersion := releaseTagName.value
-      .stripPrefix("v"), //Dynamically gets the version in the release process.
     releaseProcess := biopetReleaseProcess.value
   )
 
@@ -427,6 +425,8 @@ object BiopetPlugin extends AutoPlugin {
   protected def biopetReleaseStepsBioconda: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
+        releaseStepCommand(
+          "biocondaVersion := releaseTagName.value.stripPrefix(\"v\")"), //Dynamically gets the version in the release process.
         releaseStepCommand("biocondaRelease")
       )
     }
