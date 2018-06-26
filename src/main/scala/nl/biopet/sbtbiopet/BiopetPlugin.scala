@@ -74,6 +74,7 @@ import sbtrelease.ReleasePlugin.autoImport.{
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
+
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
 
@@ -144,25 +145,26 @@ object BiopetPlugin extends AutoPlugin {
     Def.settings(
       biopetEnableCodacyCoverage := true,
       commands += Command.command("biopetTest") { state =>
-        val cmds: List[String] =
-          List(
-            Some("scalafmt::test"),
-            Some("test:scalafmt::test"),
-            Some("sbt:scalafmt::test"),
-            Some("headerCreate"),
-            Some("coverage"),
-            Some("test"),
-            Some("coverageReport"),
-            Some("coverageAggregate"), {
-              if (biopetEnableCodacyCoverage.value) Some("codacyCoverage")
-              else None
-            },
-            Some("makeSite"),
-            Some("biopetGenerateReadme")
-          ).flatten
-
-        cmds.foldRight(state)(_ :: _)
-
+        List(
+          "scalafmt::test",
+          "test:scalafmt::test",
+          "sbt:scalafmt::test",
+          "headerCreate",
+          "coverage",
+          "makeSite",
+          "biopetGenerateReadme",
+          "test"
+        ).foldRight(state)(_ :: _)
+      },
+      commands += Command.command("biopetTestReport") { state =>
+        List(
+          Some("coverageReport"),
+          Some("coverageAggregate"), {
+            if (biopetEnableCodacyCoverage.value) Some("codacyCoverage")
+            else None
+          }
+        ).flatten
+          .foldRight(state)(_ :: _)
       }
     )
   }
