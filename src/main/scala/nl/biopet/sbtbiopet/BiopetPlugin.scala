@@ -24,35 +24,19 @@ package nl.biopet.sbtbiopet
 import java.io.File
 
 import com.codacy.CodacyCoveragePlugin
-import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
-  scalafmt,
-  scalafmtOnCompile
-}
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{scalafmt, scalafmtOnCompile}
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
-  ghpagesCleanSite,
-  ghpagesPushSite,
-  ghpagesRepository
-}
-import com.typesafe.sbt.site.SitePlugin.autoImport.{
-  makeSite,
-  siteDirectory,
-  siteSubdirName
-}
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{ghpagesCleanSite, ghpagesPushSite, ghpagesRepository}
+import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory, siteSubdirName}
 import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
-  HeaderCommentStyle,
-  headerCheck,
-  headerCreate,
-  headerMappings
-}
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{HeaderCommentStyle, headerCheck, headerCreate, headerMappings}
 import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
 import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import nl.biopet.bioconda.BiocondaPlugin
@@ -66,6 +50,7 @@ import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleaseStateTransformations.pushChanges
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -397,7 +382,8 @@ object BiopetPlugin extends AutoPlugin {
         runTest,
         setReleaseVersion,
         commitReleaseVersion,
-        tagRelease
+        tagRelease,
+        pushChanges
       )
     }
   }
@@ -416,7 +402,6 @@ object BiopetPlugin extends AutoPlugin {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
         releaseStepCommand("ghpagesPushSite"),
-        pushChanges,
         releaseStepCommand("githubRelease")
       )
     }
