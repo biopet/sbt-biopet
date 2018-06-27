@@ -21,8 +21,6 @@
 
 package nl.biopet.sbtbiopet
 
-import java.io.File
-
 import com.codacy.CodacyCoveragePlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
   scalafmt,
@@ -31,21 +29,8 @@ import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.{
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin
 import com.lucidchart.sbt.scalafmt.ScalafmtSbtPlugin.autoImport.Sbt
 import com.typesafe.sbt.SbtGit.git
-import com.typesafe.sbt.SbtPgp.autoImport.useGpg
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.{
-  ghpagesCleanSite,
-  ghpagesPushSite,
-  ghpagesRepository
-}
-import com.typesafe.sbt.site.SitePlugin.autoImport.{
-  makeSite,
-  siteDirectory,
-  siteSubdirName
-}
-import com.typesafe.sbt.site.SiteScaladocPlugin.autoImport.SiteScaladoc
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
-import com.typesafe.sbt.site.laika.LaikaSitePlugin.autoImport.LaikaSite
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
   HeaderCommentStyle,
@@ -54,19 +39,16 @@ import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
   headerMappings
 }
 import de.heikoseeberger.sbtheader.{FileType, HeaderPlugin}
-import laika.sbt.LaikaPlugin.autoImport.{Laika, laikaRawContent}
 import nl.biopet.bioconda.BiocondaPlugin
 import nl.biopet.bioconda.BiocondaPlugin.autoImport._
-import nl.biopet.utils.Documentation.{htmlRedirector, markdownExtractChapter}
-import ohnosequences.sbt.SbtGithubReleasePlugin.autoImport._
-import ohnosequences.sbt.{GithubRelease, SbtGithubReleasePlugin}
+import nl.biopet.sbtbiopet.BiopetDocumentationSettings._
+import nl.biopet.sbtbiopet.BiopetReleaseSettings._
+import nl.biopet.utils.Documentation.markdownExtractChapter
+import ohnosequences.sbt.SbtGithubReleasePlugin
 import sbt.Keys._
 import sbt.{Def, _}
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{AssemblyPlugin, MergeStrategy}
-import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport._
-import sbtrelease.ReleaseStateTransformations.pushChanges
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
@@ -164,6 +146,7 @@ object BiopetPlugin extends AutoPlugin {
       }
     )
   }
+
   /*
    * Contains al settings related to the license header
    */
@@ -190,6 +173,7 @@ object BiopetPlugin extends AutoPlugin {
         .dependsOn(headerCheck in Test)
         .value
     )
+
   /*
    * A sequence of settings containing information such as homepage, licences and git related information.
    */
@@ -206,79 +190,6 @@ object BiopetPlugin extends AutoPlugin {
       )),
     git.remoteRepo := s"git@github.com:${githubOrganization.value}/${biopetUrlName.value}.git",
     biopetIsTool := false // This should not have to be defined for utils.
-  )
-
-  /*
-   * A sequence of settings specific to release
-   */
-  protected def biopetReleaseSettings: Seq[Setting[_]] = Seq(
-    resolvers += Resolver.sonatypeRepo("snapshots"),
-    resolvers += Resolver.sonatypeRepo("releases"),
-    releaseCrossBuild := true,
-    publishTo := biopetPublishTo.value,
-    publishMavenStyle := true,
-    useGpg := true,
-    ghreleaseRepoName := biopetUrlName.value,
-    ghreleaseAssets := {
-      val assemblyPath = (assemblyOutputPath in assembly).value
-      if (biopetIsTool.value) Seq(assemblyPath) else Seq()
-    },
-    ghreleaseRepoOrg := githubOrganization.value,
-    //ghreleaseTitle same as upstream default. Specified here to be stable between releases.
-    ghreleaseTitle := { tagName =>
-      s"${name.value} $tagName"
-    },
-    // ghreleaseNotes generic message. (Empty message leads to prompt).
-    ghreleaseNotes := { tagName =>
-      s"Release ${tagName.stripPrefix("v")}"
-    },
-    // ghreleaseGithubToken copied from default for stability.
-    ghreleaseGithubToken := {
-      GithubRelease.defs.githubTokenFromEnv(
-        GithubRelease.defs.defaultTokenEnvVar) orElse
-        GithubRelease.defs.githubTokenFromFile(
-          GithubRelease.defs.defaultTokenFile)
-    },
-    biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
-    biopetReleaseInSonatype := true,
-    releaseProcess := biopetReleaseProcess.value
-  )
-
-  /*
-   * A sequence of settings related to documentation.
-   * This includes all the settings for
-   *  - LAIKA
-   *  - Ghpagesplugin
-   *  - Our custom documentation generation code
-   *  - SBT-site
-   */
-  protected def biopetDocumentationSettings: Seq[Setting[_]] = Seq(
-    biopetDocsDir := file(
-      s"%s${File.separator}markdown".format(target.value.toString)),
-    biopetReadmePath := file("README.md").getAbsoluteFile,
-    sourceDirectory in LaikaSite := biopetDocsDir.value,
-    sourceDirectories in Laika := Seq((sourceDirectory in LaikaSite).value),
-    siteDirectory in Laika := file(
-      target.value.toString + s"${File.separator}site"),
-    ghpagesRepository := file(target.value.toString + s"${File.separator}gh"),
-    siteSubdirName in SiteScaladoc := {
-      if (biopetIsTool.value) {
-        if (isSnapshot.value) {
-          s"develop${File.separator}api"
-        } else s"${version.value}${File.separator}api"
-      } else {
-        if (isSnapshot.value) {
-          "develop"
-        } else s"${version.value}"
-      }
-    },
-    laikaRawContent in LaikaSite := true, //Laika use raw HTML content in markdown.
-    includeFilter in ghpagesCleanSite := biopetCleanSiteFilter.value,
-    biopetGenerateDocs := biopetGenerateDocsFunction().value,
-    biopetGenerateReadme := biopetGenerateReadmeFunction().value,
-    makeSite := (makeSite triggeredBy biopetGenerateDocs).value,
-    makeSite := (makeSite dependsOn biopetGenerateDocs).value,
-    ghpagesPushSite := (ghpagesPushSite dependsOn makeSite).value
   )
 
   protected def biopetScalafmtSettings: Seq[Setting[_]] = Seq(
@@ -316,7 +227,10 @@ object BiopetPlugin extends AutoPlugin {
               // Remove whitespace from beginning and end of string.
               .trim)
             }
-        } else Def.task { Some("") }
+        } else
+          Def.task {
+            Some("")
+          }
       }
       .dependsOn(biopetGenerateReadme)
       .value,
@@ -329,17 +243,23 @@ object BiopetPlugin extends AutoPlugin {
               markdownExtractChapter(readme, name.value, includeHeader = false)
             // Assuming the first sentence ends with .
             description.split("\\.").headOption match {
-              case Some(s) => { s + "." }.replace("\n", " ").trim
+              case Some(s) => {
+                s + "."
+              }.replace("\n", " ").trim
               case _ =>
                 s"This summary for ${(name in Bioconda).value} was automatically generated."
             }
 
           }
-        } else Def.task { "" }
+        } else
+          Def.task {
+            ""
+          }
       }
       .dependsOn(biopetGenerateReadme)
       .value
   )
+
   /*
    * The merge strategy that is used in biopet projects
    */
@@ -373,211 +293,4 @@ object BiopetPlugin extends AutoPlugin {
       }
     case _ => MergeStrategy.first
   }
-
-  /*
-   * Biopet resolver.
-   */
-  protected def biopetPublishTo: Def.Initialize[Option[Resolver]] =
-    Def.setting {
-      if (isSnapshot.value)
-        Some(Opts.resolver.sonatypeSnapshots)
-      else
-        Some(Opts.resolver.sonatypeStaging)
-    }
-
-  protected def biopetReleaseStepsStart: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("git fetch"),
-        releaseStepCommand("git checkout master"),
-        releaseStepCommand("git pull"),
-        releaseStepCommand("git merge origin/develop"),
-        checkSnapshotDependencies,
-        inquireVersions,
-        runClean,
-        runTest,
-        setReleaseVersion,
-        commitReleaseVersion,
-        tagRelease,
-        pushChanges
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsSonatype: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand(s"sonatypeOpen ${name.value}"),
-        releaseStepCommand("publishSigned"),
-        releaseStepCommand("sonatypeReleaseAll")
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsGithub: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("ghpagesPushSite"),
-        releaseStepCommand("githubRelease")
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsBioconda: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand(
-          "set biocondaVersion := releaseTagName.value.stripPrefix(\"v\")"), //Dynamically gets the version in the release process.
-        releaseStepCommand("biocondaRelease")
-      )
-    }
-  }
-
-  protected def biopetReleaseStepsAssembly: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("set test in assembly := {}"),
-        releaseStepCommand("assembly")
-      )
-    }
-  }
-  protected def biopetReleaseStepsNextVersion
-    : Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      Seq[ReleaseStep](
-        releaseStepCommand("git checkout develop"),
-        releaseStepCommand("git merge master"),
-        setNextVersion,
-        commitNextVersion,
-        pushChanges
-      )
-    }
-  }
-  /*
-   * The ReleaseProcess for use with the sbt-release plugin
-   */
-  protected def biopetReleaseProcess: Def.Initialize[Seq[ReleaseStep]] = {
-    Def.setting[Seq[ReleaseStep]] {
-      biopetReleaseStepsStart.value ++ {
-        if (biopetIsTool.value) biopetReleaseStepsAssembly.value else Seq()
-      } ++ {
-        if (biopetReleaseInSonatype.value) biopetReleaseStepsSonatype.value
-        else Seq()
-      } ++
-        biopetReleaseStepsGithub.value ++ {
-        if (biopetReleaseInBioconda.value) biopetReleaseStepsBioconda.value
-        else Seq()
-      } ++
-        biopetReleaseStepsNextVersion.value
-    }
-  }
-
-  /*
-   * The filter that is used by the ghpages plugin.
-   * All files in this filter will be removed.
-   * This allows the updating of documentation for a specific version
-   * All other versions will not be touched.
-   */
-  protected def biopetCleanSiteFilter: Def.Initialize[FileFilter] =
-    Def.setting {
-      new FileFilter {
-        def accept(f: File): Boolean = {
-          // Take the relative path, so only values within the
-          // ghpagesRepository are taken into account.
-          val empty: File = new File("")
-          val relativePath: TagName =
-            f.relativeTo(ghpagesRepository.value).getOrElse(empty).toString
-          if (isSnapshot.value) {
-            relativePath.contains("develop")
-          } else {
-            relativePath.contains(s"${version.value}") ||
-            // Also index.html needs to deleted to point to a new version.
-            f.getPath == new java.io.File(ghpagesRepository.value, "index.html").getPath
-          }
-        }
-      }
-    }
-
-  /*
-   * Accesses the tools main method to generate documentation using our custom built-in documentation function
-   */
-  protected def biopetGenerateDocsFunction(): Def.Initialize[Task[Unit]] =
-    Def.taskDyn {
-      if (biopetIsTool.value) {
-        Def
-          .task[Unit] {
-            val r = (runner in Compile).value
-            val classPath = (fullClasspath in Compile).value
-
-            val streamsLogValue = streams.value.log
-
-            val args = Seq("--generateDocs",
-                           s"outputDir=${biopetDocsDir.value.toString}," +
-                             s"version=${version.value}," +
-                             s"release=${!isSnapshot.value}",
-                           version.value)
-
-            val mainClassString = (mainClass in assembly).value match {
-              case Some(x) => x
-              case _ =>
-                throw new IllegalStateException(
-                  "Mainclass should be defined for a tool.")
-            }
-            import Attributed.data
-            r.run(
-              mainClassString,
-              data(classPath),
-              args,
-              streamsLogValue
-            )
-
-          }
-          .dependsOn(compile in Compile)
-      } else
-        Def.task[Unit] {
-          biopetDocsDir.value.mkdirs()
-          if (!isSnapshot.value) {
-            val htmlRedirectFile: sbt.File = biopetDocsDir.value / "index.html"
-            htmlRedirector(
-              outputFile = htmlRedirectFile,
-              link = s"${version.value}${File.separator}index.html",
-              title = "API documentation",
-              redirectText = "Go to the API documentation")
-          }
-        }
-    }
-
-  /*
-   * Accesses the tools main method to generate a README using our custom built-in documentation function
-   */
-  protected def biopetGenerateReadmeFunction(): Def.Initialize[Task[Unit]] =
-    Def.taskDyn {
-      if (biopetIsTool.value) {
-        Def
-          .task[Unit] {
-            val r = (runner in Compile).value
-            val classPath = (fullClasspath in Compile).value
-
-            val args = Seq("--generateReadme", biopetReadmePath.value.toString)
-
-            val streamsLogValue = streams.value.log
-
-            val mainClassString = (mainClass in assembly).value match {
-              case Some(x) => x
-              case _ =>
-                throw new IllegalStateException(
-                  "Mainclass should be defined for a tool.")
-            }
-            import Attributed.data
-            r.run(
-              mainClassString,
-              data(classPath),
-              args,
-              streamsLogValue
-            )
-
-          }
-          .dependsOn(compile in Compile)
-      } else Def.task[Unit] {}
-    }
 }
