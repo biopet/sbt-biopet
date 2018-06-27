@@ -40,8 +40,8 @@ import nl.biopet.sbtbiopet.BiopetPlugin.autoImport._
 import nl.biopet.utils.Documentation.htmlRedirector
 import ohnosequences.sbt.GithubRelease.keys.TagName
 import sbt.Keys._
+import sbt._
 import sbt.io.IO.relativize
-import sbt.{Attributed, Compile, Def, File, FileFilter, Setting, Task, file}
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
 object BiopetDocumentationSettings {
@@ -135,10 +135,9 @@ object BiopetDocumentationSettings {
           throw new IllegalStateException(
             "Mainclass should be defined for a tool.")
       }
-      import Attributed.data
       r.run(
         mainClassString,
-        data(classPath),
+        Attributed.data(classPath),
         args,
         streamsLogValue
       )
