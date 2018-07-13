@@ -48,4 +48,5 @@ trait BiopetKeys {
   lazy val biopetReleaseAssembly = settingKey[Seq[ReleaseStep]]("")
   lazy val biopetReleaseBioconda = settingKey[Seq[ReleaseStep]]("")
   lazy val biopetReleaseNextVersion = settingKey[Seq[ReleaseStep]]("")
+  lazy val biopetSetVersion = settingKey[Seq[ReleaseStep]]("")
 }
