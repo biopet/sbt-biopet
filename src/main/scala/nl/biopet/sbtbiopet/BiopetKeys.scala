@@ -22,6 +22,7 @@
 package nl.biopet.sbtbiopet
 
 import sbt._
+import sbtrelease.ReleasePlugin.autoImport.ReleaseStep
 
 trait BiopetKeys {
   lazy val biopetDocsDir = SettingKey[File](
@@ -41,4 +42,10 @@ trait BiopetKeys {
     settingKey[String]("The organization name on github")
   lazy val biopetEnableCodacyCoverage = settingKey[Boolean](
     "Whether codacy coverage should be enabled in bopetTest")
+  lazy val biopetReleaseStart = taskKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseSonatype = taskKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseGithub = taskKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseAssembly = taskKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseBioconda = taskKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseNextVersion = taskKey[Seq[ReleaseStep]]("")
 }
