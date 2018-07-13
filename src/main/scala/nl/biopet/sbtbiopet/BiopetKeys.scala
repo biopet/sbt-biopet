@@ -42,10 +42,10 @@ trait BiopetKeys {
     settingKey[String]("The organization name on github")
   lazy val biopetEnableCodacyCoverage = settingKey[Boolean](
     "Whether codacy coverage should be enabled in bopetTest")
-  lazy val biopetReleaseStart = taskKey[Seq[ReleaseStep]]("")
-  lazy val biopetReleaseSonatype = taskKey[Seq[ReleaseStep]]("")
-  lazy val biopetReleaseGithub = taskKey[Seq[ReleaseStep]]("")
-  lazy val biopetReleaseAssembly = taskKey[Seq[ReleaseStep]]("")
-  lazy val biopetReleaseBioconda = taskKey[Seq[ReleaseStep]]("")
-  lazy val biopetReleaseNextVersion = taskKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseStart = settingKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseSonatype = settingKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseGithub = settingKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseAssembly = settingKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseBioconda = settingKey[Seq[ReleaseStep]]("")
+  lazy val biopetReleaseNextVersion = settingKey[Seq[ReleaseStep]]("")
 }
