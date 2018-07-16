@@ -100,7 +100,7 @@ object BiopetPlugin extends AutoPlugin {
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
       BiocondaPlugin.projectSettings ++
-      CodacyCoveragePlugin.projectSettings +
+      CodacyCoveragePlugin.projectSettings ++
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
