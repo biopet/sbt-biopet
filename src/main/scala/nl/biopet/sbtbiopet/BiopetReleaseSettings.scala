@@ -70,13 +70,7 @@ object BiopetReleaseSettings {
     },
     biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
     biopetReleaseInSonatype := true,
-    releaseProcess := biopetReleaseProcess.value,
-    biopetReleaseAssembly := biopetReleaseStepsAssembly.value,
-    biopetReleaseBioconda := biopetReleaseStepsBioconda.value,
-    biopetReleaseStart := biopetReleaseStepsStart.value,
-    biopetReleaseGithub := biopetReleaseStepsGithub.value,
-    biopetReleaseSonatype := biopetReleaseStepsSonatype.value,
-    biopetSetVersion := Seq(inquireVersions)
+    releaseProcess := biopetReleaseProcess.value
   )
   protected def biopetReleaseStepsStart: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {

@@ -32,7 +32,6 @@ import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
 import com.typesafe.sbt.site.laika.LaikaSitePlugin
 import com.typesafe.sbt.site.{SitePlugin, SiteScaladocPlugin}
-import xerial.sbt.Sonatype
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{
   HeaderCommentStyle,
   headerCheck,
@@ -101,8 +100,7 @@ object BiopetPlugin extends AutoPlugin {
       HeaderPlugin.projectSettings ++
       SbtGithubReleasePlugin.projectSettings ++
       BiocondaPlugin.projectSettings ++
-      CodacyCoveragePlugin.projectSettings ++
-      Sonatype.projectSettings ++
+      CodacyCoveragePlugin.projectSettings +
       biopetProjectInformationSettings ++
       biopetAssemblySettings ++
       biopetReleaseSettings ++
