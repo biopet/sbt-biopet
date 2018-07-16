@@ -92,7 +92,8 @@ object BiopetReleaseSettings {
           inquireVersions,
           setReleaseVersion,
           commitReleaseVersion,
-          tagRelease
+          tagRelease,
+          pushChanges
         )
     }
   }
@@ -109,7 +110,6 @@ object BiopetReleaseSettings {
   protected def biopetReleaseStepsGithub: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
-        pushChanges,
         releaseStepCommand("ghpagesPushSite"),
         releaseStepCommand("githubRelease")
       )
