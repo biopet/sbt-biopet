@@ -80,21 +80,27 @@ object BiopetReleaseSettings {
         releaseStepCommand("git pull"),
         releaseStepCommand("git merge origin/develop"),
         checkSnapshotDependencies,
-        inquireVersions,
         runClean,
-        runTest,
-        setReleaseVersion,
-        commitReleaseVersion,
-        tagRelease,
-        pushChanges
-      )
+        runTest
+      ) ++ {
+        // Move sonatype open here, because it seems to mess with versions.
+        if (biopetReleaseInSonatype.value)
+          Seq[ReleaseStep](releaseStepCommand(s"sonatypeOpen ${name.value}"))
+        else Seq[ReleaseStep]()
+      } ++
+        Seq[ReleaseStep](
+          inquireVersions,
+          setReleaseVersion,
+          commitReleaseVersion,
+          tagRelease,
+          pushChanges
+        )
     }
   }
 
   protected def biopetReleaseStepsSonatype: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
-        releaseStepCommand(s"sonatypeOpen ${name.value}"),
         releaseStepCommand("publishSigned"),
         releaseStepCommand("sonatypeReleaseAll")
       )
