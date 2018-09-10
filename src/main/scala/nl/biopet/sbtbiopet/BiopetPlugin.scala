@@ -52,6 +52,7 @@ import sbtassembly.{AssemblyPlugin, MergeStrategy}
 import scoverage.ScoverageSbtPlugin
 
 import scala.io.Source
+import scala.util.matching.Regex
 
 object BiopetPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = AllRequirements
@@ -217,15 +218,17 @@ object BiopetPlugin extends AutoPlugin {
         if (biopetIsTool.value) {
           Def
             .task {
-              Some({
-                markdownExtractChapter(readme,
-                                       name.value,
-                                       includeHeader = false).trim +
-                  s"\n\nFor documentation and manuals visit our github.io page: " +
-                  s"https://${githubOrganization.value}.github.io/${biopetUrlName.value}"
-              }
+              val description = markdownExtractChapter(
+                readme,
+                name.value,
+                includeHeader = false).trim +
+                s"\n\nFor documentation and manuals visit our github.io page: " +
+                s"https://${githubOrganization.value}.github.io/${biopetUrlName.value}"
               // Remove whitespace from beginning and end of string.
-              .trim)
+              // remove spaces at end of line.
+              val trimmedDescription =
+                description.trim.replaceAll("( +)(\\n)", "$2")
+              Some(trimmedDescription)
             }
         } else
           Def.task {
