@@ -217,15 +217,26 @@ object BiopetPlugin extends AutoPlugin {
         if (biopetIsTool.value) {
           Def
             .task {
-              Some({
-                markdownExtractChapter(readme,
-                                       name.value,
-                                       includeHeader = false).trim +
-                  s"\n\nFor documentation and manuals visit our github.io page: " +
-                  s"https://${githubOrganization.value}.github.io/${biopetUrlName.value}"
-              }
-              // Remove whitespace from beginning and end of string.
-              .trim)
+              val description = markdownExtractChapter(
+                readme,
+                name.value,
+                includeHeader = false).trim +
+                s"\n\nFor documentation and manuals visit our github.io page: " +
+                s"https://${githubOrganization.value}.github.io/${biopetUrlName.value}"
+
+              val trimmedDescription =
+                description
+                // Remove whitespace from beginning and end of string.
+                // Large number of newlines can make things look ugly.
+                .trim
+                // remove spaces at end of line. This is needed to get literal style '|' strings
+                  .replaceAll("( +)(\\n)", "$2")
+                  // Remove insanely long whitespace distances. Not more than 2 empty lines allowed.
+                  .replaceAll("(\\n\\n\\n)(\\n*)", "$1") +
+                  // The extra "\n" is for a nicer meta.yaml because it results in '|' instead of '|-'.
+                  // And some bioconda reviewers care a lot about small details.
+                  "\n"
+              Some(trimmedDescription)
             }
         } else
           Def.task {
