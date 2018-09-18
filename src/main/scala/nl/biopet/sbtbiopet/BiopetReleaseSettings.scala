@@ -32,7 +32,8 @@ import sbtrelease.ReleasePlugin.autoImport.{
   ReleaseStep,
   releaseCrossBuild,
   releaseProcess,
-  releaseStepCommand
+  releaseStepCommand,
+  releaseStepCommandAndRemaining
 }
 import sbtrelease.ReleaseStateTransformations._
 
@@ -101,7 +102,7 @@ object BiopetReleaseSettings {
   protected def biopetReleaseStepsSonatype: Def.Initialize[Seq[ReleaseStep]] = {
     Def.setting[Seq[ReleaseStep]] {
       Seq[ReleaseStep](
-        releaseStepCommand("publishSigned"),
+        releaseStepCommandAndRemaining("+publishSigned"),
         releaseStepCommand("sonatypeReleaseAll")
       )
     }
