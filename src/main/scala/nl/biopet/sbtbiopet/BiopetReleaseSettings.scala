@@ -70,7 +70,7 @@ object BiopetReleaseSettings {
           GithubRelease.defs.defaultTokenFile)
     },
     biopetReleaseInBioconda := biopetIsTool.value, // Only release tools in bioconda, not libraries
-    biopetReleaseInSonatype := true,
+    biopetReleaseInSonatype := !biopetIsPipeline.value, // Pipelines should not be in sonatype
     releaseProcess := biopetReleaseProcess.value
   )
   protected def biopetReleaseStepsStart: Def.Initialize[Seq[ReleaseStep]] = {
@@ -79,11 +79,17 @@ object BiopetReleaseSettings {
         releaseStepCommand("git fetch"),
         releaseStepCommand("git checkout master"),
         releaseStepCommand("git pull"),
-        releaseStepCommand("git merge origin/develop"),
-        checkSnapshotDependencies,
-        runClean,
-        runTest
+        releaseStepCommand("git merge origin/develop")
       ) ++ {
+        // Don't do code checks on pipelines.
+        if (!biopetIsPipeline.value)
+          Seq[ReleaseStep](
+            checkSnapshotDependencies,
+            runClean,
+            runTest
+          )
+        else Seq[ReleaseStep]()
+      } ++ {
         // Move sonatype open here, because it seems to mess with versions.
         if (biopetReleaseInSonatype.value)
           Seq[ReleaseStep](releaseStepCommand(s"sonatypeOpen ${name.value}"))
@@ -157,8 +163,9 @@ object BiopetReleaseSettings {
       } ++ {
         if (biopetReleaseInSonatype.value) biopetReleaseStepsSonatype.value
         else Seq()
-      } ++
-        biopetReleaseStepsGithub.value ++ {
+      } ++ {
+        if (!biopetIsPipeline.value) biopetReleaseStepsGithub.value else Seq()
+      } ++ {
         if (biopetReleaseInBioconda.value) biopetReleaseStepsBioconda.value
         else Seq()
       } ++
