@@ -178,7 +178,7 @@ object BiopetPlugin extends AutoPlugin {
    * A sequence of settings containing information such as homepage, licences and git related information.
    */
   protected def biopetProjectInformationSettings: Seq[Setting[_]] = Seq(
-    githubOrganization := "biopet",
+    githubOrganization := { if (biopetIsPipeline.value) "biowdl" else "biopet" },
     homepage := Some(url(
       s"https://github.com/${githubOrganization.value}/${biopetUrlName.value}")),
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
