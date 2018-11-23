@@ -163,8 +163,9 @@ object BiopetReleaseSettings {
       } ++ {
         if (biopetReleaseInSonatype.value) biopetReleaseStepsSonatype.value
         else Seq()
-      } ++
-        biopetReleaseStepsGithub.value ++ {
+      } ++ {
+        if (!biopetIsPipeline.value) biopetReleaseStepsGithub.value else Seq()
+      } ++ {
         if (biopetReleaseInBioconda.value) biopetReleaseStepsBioconda.value
         else Seq()
       } ++
