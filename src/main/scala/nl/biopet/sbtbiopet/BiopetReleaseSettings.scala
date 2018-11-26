@@ -28,20 +28,12 @@ import nl.biopet.sbtbiopet.BiopetPlugin.autoImport._
 import ohnosequences.sbt.GithubRelease
 import ohnosequences.sbt.GithubRelease.keys._
 import sbt.Keys._
-import sbt.internal.util.ManagedLogger
 import sbt.{Def, Opts, Resolver, Setting, State}
+import sbtassembly.AssemblyPlugin.autoImport.{assembly, assemblyOutputPath}
+import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleaseStateTransformations._
 
 import scala.sys.process._
-import sbtassembly.AssemblyPlugin.autoImport.{assembly, assemblyOutputPath}
-import sbtrelease.Compat
-import sbtrelease.ReleasePlugin.autoImport.{
-  ReleaseStep,
-  releaseCrossBuild,
-  releaseProcess,
-  releaseStepCommand,
-  releaseStepCommandAndRemaining
-}
-import sbtrelease.ReleaseStateTransformations._
 
 object BiopetReleaseSettings {
   /*
