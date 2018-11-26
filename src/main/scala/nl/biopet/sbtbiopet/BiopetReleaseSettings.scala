@@ -21,13 +21,19 @@
 
 package nl.biopet.sbtbiopet
 
+import java.io.File
+
 import com.typesafe.sbt.SbtPgp.autoImportImpl.useGpg
 import nl.biopet.sbtbiopet.BiopetPlugin.autoImport._
 import ohnosequences.sbt.GithubRelease
 import ohnosequences.sbt.GithubRelease.keys._
 import sbt.Keys._
-import sbt.{Def, Opts, Resolver, Setting}
+import sbt.internal.util.ManagedLogger
+import sbt.{Def, Opts, Resolver, Setting, State}
+
+import scala.sys.process._
 import sbtassembly.AssemblyPlugin.autoImport.{assembly, assemblyOutputPath}
+import sbtrelease.Compat
 import sbtrelease.ReleasePlugin.autoImport.{
   ReleaseStep,
   releaseCrossBuild,
@@ -79,7 +85,9 @@ object BiopetReleaseSettings {
         releaseStepCommand("git fetch"),
         releaseStepCommand("git checkout master"),
         releaseStepCommand("git pull"),
-        releaseStepCommand("git merge origin/develop")
+        releaseStepCommand("git merge origin/develop"),
+        releaseStepCommand("git submodule update --init --recursive"),
+        checkTaggedSubmodules(thisProject.value.base)
       ) ++ {
         // Don't do code checks on pipelines.
         if (!biopetIsPipeline.value)
@@ -172,6 +180,28 @@ object BiopetReleaseSettings {
         biopetReleaseStepsNextVersion.value
     }
   }
+
+  def checkTaggedSubmodules(gitBaseDir: File): ReleaseStep =
+    ReleaseStep({ state: State =>
+      val tagCheckProcess = Process(
+        Seq(
+          "git",
+          "submodule",
+          "foreach",
+          "--recursive",
+          "bash -c " +
+            "'if [ \"$(git tag --contains)\" == \"\" ] ; " +
+            "then  echo Untagged submodule found && exit 1 ; fi'"
+        ),
+        gitBaseDir
+      )
+      try { tagCheckProcess.!! } catch {
+        case e: RuntimeException =>
+          throw new RuntimeException(
+            s"Untagged submodule found: ${e.getMessage}")
+      }
+      state
+    })
   /*
    * Biopet resolver.
    */
